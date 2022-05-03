@@ -1,0 +1,4 @@
+conf t
+license grace
+feature ospf
+feature ssh
