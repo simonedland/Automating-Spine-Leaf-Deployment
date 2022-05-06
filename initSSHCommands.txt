@@ -2,3 +2,15 @@ conf t
 license grace
 feature ospf
 feature ssh
+router ospf 1
+router-id 10.0.1.5
+exit
+
+int Eth2/15
+no swit
+ip add 10.0.1.5/24
+ip router ospf 1 a 0
+no sh 
+exit
+username Username password Password123! role network-admin
+do copy run start

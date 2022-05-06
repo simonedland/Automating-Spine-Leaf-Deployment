@@ -1,16 +1,16 @@
 ---
 test:
   username: Username
-  password: Password
+  password: Password123!
   platform: ios
   connection_options:
     netmiko:
       extras:
         fast_cli: False
         conn_timeout: 100
-        secret: Password
+        secret: Password123!
     napalm:
       extras:
         optional_args:
           fast_cli: False
-          secret: Password
+          secret: Password123!

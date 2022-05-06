@@ -15,7 +15,8 @@ nr = InitNornir(config_file="config.yaml") #this is the nornir object
 singleHost = nr.filter(name="host1.cmh") #this is the nornir object with only one host
 
 def main():
-    print("test")
+    test = nr.run(task=netmiko_send_command, command_string="show version")
+    print_result(test)
     
 
 main() #run the main function
