@@ -1,33 +1,37 @@
 ---
- host1.cmh:
-     hostname: 10.0.1.2
+ spine1.cmh:
+     hostname: 10.100.0.1
      groups:
-         - test
- host2.cmh:
-     hostname: 10.0.1.3
+         - spine
+ spine2.cmh:
+     hostname: 10.100.0.2
      groups:
-         - test
- host3.cmh:
-     hostname: 10.0.1.4
+         - spine
+ spine3.cmh:
+     hostname: 10.100.0.3
      groups:
-         - test
- host4.cmh:
-     hostname: 10.0.1.5
+         - spine
+ leaf1.cmh:
+     hostname: 10.100.0.4
      groups:
-         - test
-# host5.cmh:
-#     hostname: 10.0.1.6
-#     groups:
-#         - test
-# host6.cmh:
-#     hostname: 10.0.1.7
-#     groups:
-#         - test
-# host7.cmh:
-#     hostname: 10.0.1.8
-#     groups:
-#         - test
-# host8.cmh:
-#     hostname: 10.0.1.9
-#     groups:
-#         - test
+         - leaf
+ leaf2.cmh:
+     hostname: 10.100.0.5
+     groups:
+         - leaf
+ leaf3.cmh:
+     hostname: 10.100.0.6
+     groups:
+         - leaf
+ leaf4.cmh:
+     hostname: 10.100.0.7
+     groups:
+         - leaf
+ leaf5.cmh:
+     hostname: 10.100.0.8
+     groups:
+         - leaf
+ leaf6.cmh:
+     hostname: 10.100.0.9
+     groups:
+         - leaf

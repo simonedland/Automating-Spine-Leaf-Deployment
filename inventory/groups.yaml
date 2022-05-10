@@ -1,16 +1,31 @@
 ---
-test:
+deafult:
   username: Username
-  password: Password123!
+  password: Password
   platform: ios
+  
+spine:
   connection_options:
     netmiko:
       extras:
         fast_cli: False
         conn_timeout: 100
-        secret: Password123!
+        secret: Password
     napalm:
       extras:
         optional_args:
+          secret: Password
           fast_cli: False
-          secret: Password123!
+
+leaf:
+  connection_options:
+    netmiko:
+      extras:
+        fast_cli: False
+        conn_timeout: 100
+        secret: Password
+    napalm:
+      extras:
+        optional_args:
+          secret: Password
+          fast_cli: False

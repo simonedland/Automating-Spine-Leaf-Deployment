@@ -1,16 +1,24 @@
+en
 conf t
-license grace
-feature ospf
-feature ssh
-router ospf 1
-router-id 10.0.1.5
+hostname leaf5
+enable secret Password
+username Username secret Password
+ip domain-name simon
+ip routing
+interface GigabitEthernet1/0
+switchport
+int g1/1
+no switchport
+ip address 10.100.0.8 255.255.255.0
+description ssh
+ip ospf 1 a 0
 exit
+crypto key generate rsa
+yes
+1024
+line vt 0 15
+login local
+transport input ssh
+exit
+do cop run start
 
-int Eth2/15
-no swit
-ip add 10.0.1.5/24
-ip router ospf 1 a 0
-no sh 
-exit
-username Username password Password123! role network-admin
-do copy run start

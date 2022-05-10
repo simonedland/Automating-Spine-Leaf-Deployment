@@ -1,23 +1,33 @@
+from cgitb import enable
 from nornir.core.task import Task, Result
 from nornir import InitNornir
 from nornir_utils.plugins.functions import print_result
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
+from nornir_napalm.plugins.tasks import napalm_get
 import time
-
+from pingTest import ping
 #todo:
 #1. basic connectivity test
-#2. make a enviroment reset function
+#2. make a enviroment reset function that compleatly resetts the enviroment back to basic functionality
+#3. tftp ssh deployment using option 82 (optional)
+#4. client side almoaste equal settup, only difrence is in host. yaml file
+
+
+
 
 startTime=time.time() #this is the start time of the program
 
 nr = InitNornir(config_file="config.yaml") #this is the nornir object
 
-singleHost = nr.filter(name="host1.cmh") #this is the nornir object with only one host
+singleHost = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
+
+nr.run(task=ping)
 
 def main():
-    test = nr.run(task=netmiko_send_command, command_string="show version")
-    print_result(test)
-    
+    #pingTest()
+    #test = nr.run(task=netmiko_send_command, command_string="show ip int br")
+    #print_result(test)
+    pass
 
 main() #run the main function
 
