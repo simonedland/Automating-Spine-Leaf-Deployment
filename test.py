@@ -6,19 +6,18 @@ from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from nornir_napalm.plugins.tasks import napalm_get
 import time
 from pingTest import ping
+from resett import resetter
+
 #todo:
 #1. make a enviroment reset function that compleatly resetts the enviroment back to basic functionality
 #2. tftp ssh deployment using option 82 (optional)
 #3. client side almoaste equal settup, only difrence is in host. yaml file
 
-
-
-
 startTime=time.time() #this is the start time of the program
-
 nr = InitNornir(config_file="config.yaml") #this is the nornir object
+singleHost = nr.filter(name="leaf1.cmh") #this is the nornir object with only one host
 
-singleHost = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
+singleHost.run(task=resetter)
 
 def main():
     nr.run(task=ping)
