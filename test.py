@@ -7,10 +7,9 @@ from nornir_napalm.plugins.tasks import napalm_get
 import time
 from pingTest import ping
 #todo:
-#1. basic connectivity test
-#2. make a enviroment reset function that compleatly resetts the enviroment back to basic functionality
-#3. tftp ssh deployment using option 82 (optional)
-#4. client side almoaste equal settup, only difrence is in host. yaml file
+#1. make a enviroment reset function that compleatly resetts the enviroment back to basic functionality
+#2. tftp ssh deployment using option 82 (optional)
+#3. client side almoaste equal settup, only difrence is in host. yaml file
 
 
 
@@ -21,10 +20,8 @@ nr = InitNornir(config_file="config.yaml") #this is the nornir object
 
 singleHost = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
 
-nr.run(task=ping)
-
 def main():
-    #pingTest()
+    nr.run(task=ping)
     #test = nr.run(task=netmiko_send_command, command_string="show ip int br")
     #print_result(test)
     pass
