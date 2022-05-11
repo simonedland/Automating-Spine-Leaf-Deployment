@@ -30,18 +30,16 @@ def resetter(node):
     pbar.colour="green"
     pbar.update()
     time.sleep(0.5)
-    pbar.leave = False
-    time.sleep(0.5)
 
-    pbar = tqdm(total=(2))
+    pbar1 = tqdm(total=(2))
 
 
     #can make this part way faster by making a single command list and then running it all at once
     node.run(task=netmiko_send_config, config_commands=["ip routing","ip route 0.0.0.0 0.0.0.0 10.100.0.100"])
 
-    pbar.set_description(f"did basic router configgs")
-    pbar.colour="yellow"
-    pbar.update()
+    pbar1.set_description(f"did basic router configgs")
+    pbar1.colour="yellow"
+    pbar1.update()
 
     #this needs some work
     commandList = []
@@ -56,7 +54,6 @@ def resetter(node):
     node.run(task=netmiko_send_config, config_commands=commandList)
 
     time.sleep(0.5)
-    pbar.colour="green"
-    pbar.update()
-    pbar.leave = False
-    time.sleep(0.5)
+    pbar1.colour="green"
+    pbar1.update()
+

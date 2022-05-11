@@ -112,4 +112,3 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
     bar.colour="green"
     bar.update()
     time.sleep(2)
-    bar.leave = False

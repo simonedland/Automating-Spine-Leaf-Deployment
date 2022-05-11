@@ -3,6 +3,7 @@
      hostname: 10.100.0.1
      groups:
          - spine
+         - minGroup
  spine2.cmh:
      hostname: 10.100.0.2
      groups:
@@ -15,10 +16,12 @@
      hostname: 10.100.0.4
      groups:
          - leaf
+         - minGroup
  leaf2.cmh:
      hostname: 10.100.0.5
      groups:
          - leaf
+         - minGroup
  leaf3.cmh:
      hostname: 10.100.0.6
      groups:

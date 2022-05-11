@@ -29,3 +29,16 @@ leaf:
         optional_args:
           secret: Password
           fast_cli: False
+
+minGroup:
+  connection_options:
+    netmiko:
+      extras:
+        fast_cli: False
+        conn_timeout: 500
+        secret: Password
+    napalm:
+      extras:
+        optional_args:
+          secret: Password
+          fast_cli: False
