@@ -9,7 +9,7 @@ spine:
     netmiko:
       extras:
         fast_cli: False
-        conn_timeout: 100
+        conn_timeout: 500
         secret: Password
     napalm:
       extras:
@@ -22,7 +22,7 @@ leaf:
     netmiko:
       extras:
         fast_cli: False
-        conn_timeout: 100
+        conn_timeout: 500
         secret: Password
     napalm:
       extras:

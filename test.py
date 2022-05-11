@@ -6,7 +6,7 @@ from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from nornir_napalm.plugins.tasks import napalm_get
 import time
 from pingTest import ping
-from resett import resetter
+from resett import resetter, resettHostName
 
 #todo:
 #1. make a enviroment reset function that compleatly resetts the enviroment back to basic functionality
@@ -14,15 +14,20 @@ from resett import resetter
 #3. client side almoaste equal settup, only difrence is in host. yaml file
 
 startTime=time.time() #this is the start time of the program
-nr = InitNornir(config_file="config.yaml") #this is the nornir object
-singleHost = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
 
 def main():
+    nr = InitNornir(config_file="config.yaml") #this is the nornir object
+    singleHost = nr.filter(name="spine2.cmh") #this is the nornir object with only one host
+
     #nr.run(task=ping)
-    #nr.run(task=resetter)
-    #test = nr.run(task=netmiko_send_command, command_string="show ip int br")
-    #print_result(test)
-    pass
+
+    print("configuring hostnames")
+    singleHost.run(task=resettHostName)
+
+    nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
+    singleHost = nr.filter(name="spine2.cmh")
+
+    singleHost.run(task=resetter)
 
 main() #run the main function
 

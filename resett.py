@@ -5,10 +5,13 @@ from nornir_napalm.plugins.tasks import napalm_get
 from tqdm import tqdm
 import time
 
+def resettHostName(node):
+    node.run(task=netmiko_send_config, config_commands=[f"hostname {str(node.host).split('.')[0]}"])
+
 
 def resetter(node):
     pbar = tqdm(total=2)
-    pbar.set_description(f"{node.host.hostname}")
+    pbar.set_description(f"gathering info on {node.host.hostname}")
 
     interfacesNetmiko = node.run(task = netmiko_send_command, command_string = "show ip int", use_textfsm = True).result
     pbar.colour="yellow"
@@ -31,12 +34,14 @@ def resetter(node):
 
     pbar = tqdm(total=(len(interfacesNapalm["interfaces"])+2))
 
+
+    #can make this part way faster by making a single command list and then running it all at once
     node.run(task=netmiko_send_config, config_commands=["ip routing"])
 
     pbar.set_description(f"did basic router configgs")
     pbar.colour="yellow"
     pbar.update()
-
+    
     for i in interfacesNapalm["interfaces"]:
         commandList = ["interface " + i , "no shutdown", "no port channel", "no channel-group"]
         if i != sshInterface:
