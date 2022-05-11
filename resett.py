@@ -7,23 +7,49 @@ import time
 
 
 def resetter(node):
-    pbar = tqdm(total=1)
+    pbar = tqdm(total=2)
     pbar.set_description(f"{node.host.hostname}")
 
     interfacesNetmiko = node.run(task = netmiko_send_command, command_string = "show ip int", use_textfsm = True).result
+    pbar.colour="yellow"
+    pbar.update()
+    time.sleep(0.2)
 
     for interface in interfacesNetmiko:
-        print(interface)
+        try:
+            if  "10.100.0." in interface["ipaddr"][0]:
+                sshInterface = interface["intf"]
+        except:
+            pass
 
 
     interfacesNapalm = node.run(task=napalm_get, getters=["interfaces"]).result
+    pbar.colour="green"
     pbar.update()
+    time.sleep(0.5)
+    pbar.close()
+
+    pbar = tqdm(total=(len(interfacesNapalm["interfaces"])+2))
+
+    node.run(task=netmiko_send_config, config_commands=["ip routing"])
+
+    pbar.set_description(f"did basic router configgs")
+    pbar.colour="yellow"
+    pbar.update()
+
+    for i in interfacesNapalm["interfaces"]:
+        commandList = ["interface " + i , "no shutdown", "no port channel", "no channel-group"]
+        if i != sshInterface:
+            commandList.extend(["interface " + i , "switchport", "no ip ospf 1 area 0", "no description", "switchport mode access", "switchport access vlan 1"])
+        else:
+            commandList.extend(["interface " + i , "no switchport", "ip ospf 1 area 0", "description ssh"])
+        node.run(task=netmiko_send_config, config_commands=commandList)
+
+        pbar.set_description(f"did {i}")
+        pbar.update()
+
     time.sleep(0.2)
+    pbar.colour="green"
+    pbar.update()
     pbar.close()
     
-    
-    print(interfacesNapalm["interfaces"].keys())
-    for x in interfacesNapalm["interfaces"].keys():
-        print(interfacesNapalm["interfaces"][x])
-        print(interfacesNapalm["interfaces"][x]["description"])
-        print(interfacesNapalm["interfaces"][x]["mac_address"])

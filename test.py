@@ -15,12 +15,11 @@ from resett import resetter
 
 startTime=time.time() #this is the start time of the program
 nr = InitNornir(config_file="config.yaml") #this is the nornir object
-singleHost = nr.filter(name="leaf1.cmh") #this is the nornir object with only one host
-
-singleHost.run(task=resetter)
+singleHost = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
 
 def main():
-    nr.run(task=ping)
+    #nr.run(task=ping)
+    #nr.run(task=resetter)
     #test = nr.run(task=netmiko_send_command, command_string="show ip int br")
     #print_result(test)
     pass
@@ -28,4 +27,4 @@ def main():
 main() #run the main function
 
 
-print(f"\n\n\n\n\nthe script took {time.time()-startTime} seconds") #prints how long the script took to run
+print(f"\n\n\n\n\n\n\n\n\n\nthe script took {time.time()-startTime} seconds") #prints how long the script took to run
