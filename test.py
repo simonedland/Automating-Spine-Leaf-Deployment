@@ -6,6 +6,7 @@ from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from nornir_napalm.plugins.tasks import napalm_get
 from nornir.core.filter import F
 from microsegmenter import MicroSegmenter
+from CopRunStart import SaveRunningToStart
 import time
 from pingTest import ping
 from resett import resetter, resettHostName
@@ -20,7 +21,7 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=True
+    bringDown=False
     oneHost=False
     useMinGroup=True
 
@@ -47,6 +48,9 @@ def main():
             SpineHostName="spine", 
             LeafHostname="leaf", 
             IpDomainName="simon")
+
+    print("saving running config to start config")
+    nr.run(task=SaveRunningToStart)
 
 
 main() #run the main function
