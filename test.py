@@ -4,6 +4,7 @@ from nornir import InitNornir
 from nornir_utils.plugins.functions import print_result
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from nornir_napalm.plugins.tasks import napalm_get
+from microsegmenter import MicroSegmenter
 import time
 from pingTest import ping
 from resett import resetter, resettHostName
@@ -16,18 +17,30 @@ from resett import resetter, resettHostName
 startTime=time.time() #this is the start time of the program
 
 def main():
+
+    bringDown=False
+    oneHost=False
+
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
-    singleHost = nr.filter(name="spine2.cmh") #this is the nornir object with only one host
+    if oneHost:
+        nr = nr.filter(name="spine2.cmh") #this is the nornir object with only one host
 
-    #nr.run(task=ping)
+    if bringDown:
+        nr.run(task=ping)
+        print("configuring hostnames and ip domain name")
+        nr.run(task=resettHostName)
+        nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
+        if oneHost:
+            nr = nr.filter(name="spine2.cmh") #this is the nornir object with only one host
+        nr.run(task=resetter)
 
-    print("configuring hostnames")
-    singleHost.run(task=resettHostName)
+    else:
+        nr.run(task=ping)
+        nr.run(task=MicroSegmenter,SegmentationIps="10.0",
+            SpineHostName="spine", 
+            LeafHostname="leaf", 
+            IpDomainName="simon")
 
-    nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
-    singleHost = nr.filter(name="spine2.cmh")
-
-    singleHost.run(task=resetter)
 
 main() #run the main function
 

@@ -15,5 +15,5 @@ def ping(node):
         pbar.colour="red"
         pbar.update()
         time.sleep(0.2)
-    pbar.close()
     time.sleep(0.2)
+    pbar.leave = False

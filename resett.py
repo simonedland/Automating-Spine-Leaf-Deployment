@@ -6,7 +6,7 @@ from tqdm import tqdm
 import time
 
 def resettHostName(node):
-    node.run(task=netmiko_send_config, config_commands=[f"hostname {str(node.host).split('.')[0]}"])
+    node.run(task=netmiko_send_config, config_commands=[f"hostname {str(node.host).split('.')[0]}", "ip domain-name simon"])
 
 
 def resetter(node):
@@ -30,31 +30,33 @@ def resetter(node):
     pbar.colour="green"
     pbar.update()
     time.sleep(0.5)
-    pbar.close()
+    pbar.leave = False
+    time.sleep(0.5)
 
-    pbar = tqdm(total=(len(interfacesNapalm["interfaces"])+2))
+    pbar = tqdm(total=(2))
 
 
     #can make this part way faster by making a single command list and then running it all at once
-    node.run(task=netmiko_send_config, config_commands=["ip routing"])
+    node.run(task=netmiko_send_config, config_commands=["ip routing","ip route 0.0.0.0 0.0.0.0 10.100.0.100"])
 
     pbar.set_description(f"did basic router configgs")
     pbar.colour="yellow"
     pbar.update()
-    
+
+    #this needs some work
+    commandList = []
     for i in interfacesNapalm["interfaces"]:
-        commandList = ["interface " + i , "no shutdown", "no port channel", "no channel-group"]
         if i != sshInterface:
-            commandList.extend(["interface " + i , "switchport", "no ip ospf 1 area 0", "no description", "switchport mode access", "switchport access vlan 1"])
+            commandList.extend(["interface " + i , "no shutdown", "no port channel", "no channel-group", "switchport", "no ip ospf 1 area 0", "no description", "switchport mode access", "switchport access vlan 1"])
         else:
-            commandList.extend(["interface " + i , "no switchport", "ip ospf 1 area 0", "description ssh"])
-        node.run(task=netmiko_send_config, config_commands=commandList)
+            commandList.extend(["interface " + i , "no switchport", "no ip ospf 1 area 0", "description ssh"])
 
-        pbar.set_description(f"did {i}")
-        pbar.update()
 
-    time.sleep(0.2)
+
+    node.run(task=netmiko_send_config, config_commands=commandList)
+
+    time.sleep(0.5)
     pbar.colour="green"
     pbar.update()
-    pbar.close()
-    
+    pbar.leave = False
+    time.sleep(0.5)
