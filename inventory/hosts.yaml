@@ -17,24 +17,36 @@
      groups:
          - leaf
          - minGroup
+     data:
+         switchpair: 1
  leaf2.cmh:
      hostname: 10.100.0.5
      groups:
          - leaf
          - minGroup
+     data:
+         switchpair: 1
  leaf3.cmh:
      hostname: 10.100.0.6
      groups:
          - leaf
+     data:
+         switchpair: 2
  leaf4.cmh:
      hostname: 10.100.0.7
      groups:
          - leaf
+     data:
+         switchpair: 2
  leaf5.cmh:
      hostname: 10.100.0.8
      groups:
          - leaf
+     data:
+         switchpair: 3
  leaf6.cmh:
      hostname: 10.100.0.9
      groups:
          - leaf
+     data:
+         switchpair: 3

@@ -1,31 +1,31 @@
-from cgitb import enable
-from codecs import ignore_errors
-from nornir.core.task import Task, Result
-from nornir import InitNornir
-from nornir_utils.plugins.functions import print_result
-from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
-from nornir_napalm.plugins.tasks import napalm_get
-from nornir.core.filter import F
+#import my own functions
 from microsegmenter import MicroSegmenter
 from CopRunStart import SaveRunningToStart
-from tqdm import tqdm
-import time
 from pingTest import ping
 from resett import resetter, resettHostName
+from hsrpPair import hsrpPair
+
+
+#import other functions
+from nornir import InitNornir
+from nornir.core.filter import F
+from tqdm import tqdm
+import time
 
 #todo:
 #config interface ip address for the difrent switch paires
-#i am not going to be using VPC due to my computer not having the capacity to emulate it
+#expand on the resetter function to reset the vlans
 #configgure HSRP
 #figgure out how to use vpc
 #make a vpn tunnel maker
-#configg the routers
+#configg the routers/edge leafs
 #figgure out how to use redundancy with the routers
 #where to putt DHCP server if eaven needed
 
 #note to self:
 #CDP should be disabled after deployment is done
 #this is bechause it is recomended by the Cisco documentation
+#i am not going to be using VPC due to my computer not having the capacity to emulate it
 
 #optional: tftp ssh config deployment using option 82 (optional)
 #optional: client side almoaste equal settup, only difrence is in host. yaml file
@@ -34,9 +34,10 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=True #this is the option to bring down the network
+    bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=True #reduce the number of hosts to the minimum required for the test
+    testNew=True #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
@@ -68,6 +69,10 @@ def main():
 
         pbar.set_description("done resetting interfaces")
         pbar.update()
+
+    elif testNew:
+        nr.run(task=hsrpPair)
+        pbar = tqdm(total=1)
 
     else:
         pbar = tqdm(total=2)
