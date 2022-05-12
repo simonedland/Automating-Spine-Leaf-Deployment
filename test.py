@@ -15,11 +15,13 @@ from resett import resetter, resettHostName
 
 #todo:
 #config interface ip address for the difrent switch paires
+#i am not going to be using VPC due to my computer not having the capacity to emulate it
 #configgure HSRP
 #figgure out how to use vpc
 #make a vpn tunnel maker
 #configg the routers
 #figgure out how to use redundancy with the routers
+#where to putt DHCP server if eaven needed
 
 #note to self:
 #CDP should be disabled after deployment is done
@@ -79,6 +81,8 @@ def main():
             SpineHostName="spine", 
             LeafHostname="leaf", 
             IpDomainName="simon")
+
+
 
     pbar.set_description("saving running config to start config")
     nr.run(task=SaveRunningToStart)
