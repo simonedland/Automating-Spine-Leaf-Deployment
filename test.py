@@ -14,18 +14,27 @@ from pingTest import ping
 from resett import resetter, resettHostName
 
 #todo:
-#
+#config interface ip address for the difrent switch paires
+#configgure HSRP
+#figgure out how to use vpc
+#make a vpn tunnel maker
+#configg the routers
+#figgure out how to use redundancy with the routers
 
-#optional: tftp ssh deployment using option 82 (optional)
+#note to self:
+#CDP should be disabled after deployment is done
+#this is bechause it is recomended by the Cisco documentation
+
+#optional: tftp ssh config deployment using option 82 (optional)
 #optional: client side almoaste equal settup, only difrence is in host. yaml file
 
 startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=True
-    oneHost=False
-    useMinGroup=True
+    bringDown=True #this is the option to bring down the network
+    oneHost=False #if you want to run on one host, set this to true
+    useMinGroup=True #reduce the number of hosts to the minimum required for the test
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
