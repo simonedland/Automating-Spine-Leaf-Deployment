@@ -22,3 +22,14 @@ transport input ssh
 exit
 do cop run start
 
+##############################################################################################
+conf t
+int g1/1
+no ip address
+switchport
+int g1/3
+no switchport
+ip address 10.100.0.9 255.255.255.0
+do cop run start
+
+

@@ -32,12 +32,12 @@ def resetter(node):
     time.sleep(0.5)
 
     pbar1 = tqdm(total=(2))
-
+    pbar1.set_description(f"doing basic router configgs")
 
     #can make this part way faster by making a single command list and then running it all at once
     node.run(task=netmiko_send_config, config_commands=["ip routing","ip route 0.0.0.0 0.0.0.0 10.100.0.100"])
 
-    pbar1.set_description(f"did basic router configgs")
+    pbar1.set_description(f"sending all interface reset commands")
     pbar1.colour="yellow"
     pbar1.update()
 
