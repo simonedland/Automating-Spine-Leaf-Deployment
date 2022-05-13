@@ -21,6 +21,7 @@ import time
 #configg the routers/edge leafs
 #figgure out how to use redundancy with the routers
 #where to putt DHCP server if eaven needed
+#livestream telemetry
 
 #note to self:
 #CDP should be disabled after deployment is done
@@ -89,8 +90,8 @@ def main():
 
 
 
-    pbar.set_description("saving running config to start config")
-    nr.run(task=SaveRunningToStart)
+    #pbar.set_description("saving running config to start config")
+    #nr.run(task=SaveRunningToStart)
 
 
     pbar.colour="green"
