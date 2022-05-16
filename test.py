@@ -21,6 +21,8 @@ import time
 #configg the routers/edge leafs
 #figgure out how to use redundancy with the routers
 #where to putt DHCP server if eaven needed
+#! tricky hsrp on the gateway leafs and touters
+#add a command counter and a average commands per second counter
 #livestream telemetry
 
 #note to self:
@@ -35,10 +37,10 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=True #this is the option to bring down the network
+    bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
-    useMinGroup=True #reduce the number of hosts to the minimum required for the test
-    testNew=True #if you want to test the new code, set this to true
+    useMinGroup=False #reduce the number of hosts to the minimum required for the test
+    testNew=False #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
@@ -72,11 +74,10 @@ def main():
         pbar.update()
 
     elif testNew:
-        nr.run(task=hsrpPair)
-        pbar = tqdm(total=1)
+        pass
 
     else:
-        pbar = tqdm(total=2)
+        pbar = tqdm(total=3)
         nr.run(task=ping)
         pbar.colour="yellow"
 
@@ -87,7 +88,10 @@ def main():
             SpineHostName="spine", 
             LeafHostname="leaf", 
             IpDomainName="simon")
-
+        
+        pbar.set_description("configging HSRP")
+        pbar.update()
+        nr.run(task=hsrpPair)
 
 
     #pbar.set_description("saving running config to start config")

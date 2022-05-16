@@ -57,8 +57,7 @@ def resetter(node):
 
 
 
-    test = node.run(task=netmiko_send_config, config_commands=commandList)
-    print_result(test)
+    node.run(task=netmiko_send_config, config_commands=commandList)
     
 
     pbar1.set_description(f"done resetting interfaces")
