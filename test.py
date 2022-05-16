@@ -14,15 +14,13 @@ import time
 
 #todo:
 #enable CDP at the start of the script
-#config interface ip address for the difrent switch paires
 #expand on the resetter function to reset the vlans
-#configgure HSRP
 #figgure out how to use vpc
 #make a vpn tunnel maker
-#configg the routers/edge leafs
+#configg the routers/edge leafs connected to WAN
+#! tricky hsrp on the gateway leafs and touters
 #figgure out how to use redundancy with the routers
 #where to putt DHCP server if eaven needed
-#! tricky hsrp on the gateway leafs and touters
 #add a command counter and a average commands per second counter
 #livestream telemetry
 #argument for having the link between the switches = if someone want single link
