@@ -2,6 +2,7 @@ from nornir_utils.plugins.functions import print_result
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from Subbnetter import subbnetter
 from tqdm import tqdm
+import time
 #required for the script to be run
 #switches to be a part of a switchpair. example : switchpair: 1 under data in host.yaml
 #switchpaires to be connected to each other
@@ -42,9 +43,10 @@ def hsrpPair(node): #main function of this script
         switchpair=node.host['switchpair']
         spine=False
     except: #if not in a switchpair meaning it is a spine
-        pbar.colour="green"
         pbar.set_description(f"{node.host}: spine") #writes to the progress bar
         pbar.update() #updates the progress bar
+        time.sleep(1)
+        pbar.colour="green"
         pbar.update() #finishes the progress bar
         spine=True
 
@@ -76,12 +78,16 @@ def hsrpPair(node): #main function of this script
         standbyIp = relevantSubnet['subbnetID'][:-1]+"1" #standby ip
         
 
-        #? remember that the vlan interface should not be advertised to the spines bechause it should be tunneled
-        #! REWRITE THE TRACKING TO DO BOOLEAN AND INTERFACE TRACKING IN LISTS
-        commandList=[]
+        #? remember that the vlan interface should not be advertised to the spines bechause it should be tunneled¨
+        #!potential problem is that if a entire spine is down it breakes this bechause it is a BOOL wich means that if two links go down on the main and only one on t he backup it will not fall back to the backup
+        #! not a big problem, but just a thing to remember
+        commandList=[("track 1 list boolean and")]
+        counter = 2
         for x in cdpNeigbourDirections:
             if "spine" in x["name"]:
-                commandList.append(f"track 1 interface {x['interface']} line-protocol") #adds the track command to the list
+                commandList.extend([f"track {counter} interface {x['interface']} line-protocol"]) #adds the track command to the list
+                commandList.extend([f"track 1", f"object {counter}"])
+                counter += 1
                 
         commandList.extend([f"vlan 1", f"interface vlan 1", f"ip address {vlanIp} 255.255.255.0" ,f"standby 1 ip {standbyIp}", f"standby 1 track 1 decrement 10", f"standby 1 preempt", f"standby 1 priority {leafPriority}", f"no sh", f"exit"])
         pbar.colour="yellow"
