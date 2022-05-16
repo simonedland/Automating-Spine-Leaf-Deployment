@@ -35,7 +35,7 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=False #this is the option to bring down the network
+    bringDown=True #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=True #reduce the number of hosts to the minimum required for the test
     testNew=True #if you want to test the new code, set this to true

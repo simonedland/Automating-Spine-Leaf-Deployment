@@ -1,9 +1,5 @@
 #TODO:
 #!find out what vlan to use (security)
-#implement priority decrementing based on interfaces
-#use CDP to find out what interfaces are connected to what
-#ignore STP due to the switches only beeing connected to one another unless the server is switched this means that i can use portfast
-#trunking the interfaces
 #?some of the information might be usefull to save for the tunneling but then again i want to make it modular to prevent having to change the code in difrent places then where the issue is
 
 from nornir_utils.plugins.functions import print_result
@@ -67,30 +63,18 @@ def hsrpPair(node):
             
         
         standbyIp = relevantSubnet['subbnetID'][:-1]+"1"
-
-        print("i am leaf",LeafNr)
-        print("i am connected to leaf",connectedLeafNr, "\n")
-
-
-        #TODO:
-        #add all the interfaces pointing to spines to a tracking list
-        #this is to decrement the priority of the hsrp
-        #track 1 interface G0/0 line-protocol
-        #no track 1
         
-
-
         #!fix vlan 10 you probably just have to add it in the 
         #? remember that the vlan interface should not be advertised to the spines bechause it should be tunneled
+
         commandList=[]
         for x in cdpNeigbourDirections:
-            if "spine" in x:
-                print(x)
+            if "spine" in x["name"]:
+                commandList.append(f"track 1 interface {x['interface']} line-protocol")
                 
-        commandList.extend([f"vlan 1", f"interface vlan 1", f"ip address {vlanIp} 255.255.255.0" ,f"standby 1 ip {standbyIp}", f"standby 1 preempt", f"standby 1 priority {leafPriority}", f"no sh", f"exit"])
+        commandList.extend([f"vlan 1", f"interface vlan 1", f"ip address {vlanIp} 255.255.255.0" ,f"standby 1 ip {standbyIp}", f"standby 1 track 1 decrement 10", f"standby 1 preempt", f"standby 1 priority {leafPriority}", f"no sh", f"exit"])
 
-        test = node.run(task=netmiko_send_config, config_commands=commandList)
-        print_result(test)
+        node.run(task=netmiko_send_config, config_commands=commandList)
 
     #print(switchpair)
     

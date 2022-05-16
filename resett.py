@@ -42,19 +42,24 @@ def resetter(node):
     pbar1.update()
 
     #this needs some work
-    commandList = []
+    commandList = [f"no track 1", "no router ospf 1"]
     #print(interfacesNapalm["interfaces"])
     for i in interfacesNapalm["interfaces"]:
         if i != sshInterface:
             if "Vlan" in i:
-                commandList.extend(["interface " + i , f"no ip add" ,"no shutdown", "no port channel", "no channel-group",f"no standby 1 ip ", f"no standby 1 preempt", f"no standby 1 priority", "no ip ospf 1 area 0", "no description"])
-            commandList.extend(["interface " + i , "no shutdown", "no port channel", "no channel-group", "switchport", "no ip ospf 1 area 0", "no description", "switchport mode access", "switchport access vlan 1"])
+                commandList.extend(["interface " + i , f"no ip add" ,"no shutdown", f"no standby 1 ip ", f"no standby 1 preempt", f"no standby 1 priority", f"no standby 1 track 1", "no description"])
+            elif "Loop" in i:
+                commandList.extend(["interface " + i , f"no ip add" ,"no shutdown"])
+            else:
+                commandList.extend(["interface " + i , "no shutdown", "no channel-group", "switchport", "no description", "switchport mode access", "switchport access vlan 1"])
         else:
             commandList.extend(["interface " + i , "no switchport", "description ssh"])
 
 
 
-    node.run(task=netmiko_send_config, config_commands=commandList)
+    test = node.run(task=netmiko_send_config, config_commands=commandList)
+    print_result(test)
+    
 
     pbar1.set_description(f"done resetting interfaces")
     pbar1.colour="green"
