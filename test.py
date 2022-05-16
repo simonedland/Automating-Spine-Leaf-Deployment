@@ -24,6 +24,7 @@ import time
 #! tricky hsrp on the gateway leafs and touters
 #add a command counter and a average commands per second counter
 #livestream telemetry
+#argument for having the link between the switches = if someone want single link
 
 #note to self:
 #CDP should be disabled after deployment is done
@@ -39,7 +40,7 @@ def main():
 
     bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
-    useMinGroup=False #reduce the number of hosts to the minimum required for the test
+    useMinGroup=True #reduce the number of hosts to the minimum required for the test
     testNew=False #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
