@@ -1,6 +1,5 @@
 #TODO:
 #!find out what vlan to use (security)
-#?some of the information might be usefull to save for the tunneling but then again i want to make it modular to prevent having to change the code in difrent places then where the issue is
 
 from nornir_utils.plugins.functions import print_result
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
@@ -60,13 +59,11 @@ def hsrpPair(node):
         else: #!high leaf
             vlanIp = relevantSubnet['subbnetID'][:-1]+"3"
             leafPriority=100
-            
         
         standbyIp = relevantSubnet['subbnetID'][:-1]+"1"
         
-        #!fix vlan 10 you probably just have to add it in the 
+        
         #? remember that the vlan interface should not be advertised to the spines bechause it should be tunneled
-
         commandList=[]
         for x in cdpNeigbourDirections:
             if "spine" in x["name"]:
