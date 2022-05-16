@@ -11,7 +11,7 @@ import time
 def hsrpPair(node): #main function of this script
     pbar = tqdm(total=4)
     subbnetList=[]
-    subbnetList.append(subbnetter(nettwork=f"192.168.1.0",
+    subbnetList.append(subbnetter(nettwork=f"192.168.2.0",
         nettworkReq=[
         {"numberOfSubbnets":10, "requiredHosts":255},
         ])) #makes 1 subbnets with 255 hosts each
