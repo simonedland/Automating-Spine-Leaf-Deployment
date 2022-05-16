@@ -13,6 +13,7 @@ from tqdm import tqdm
 import time
 
 #todo:
+#enable CDP at the start of the script
 #config interface ip address for the difrent switch paires
 #expand on the resetter function to reset the vlans
 #configgure HSRP
@@ -49,35 +50,35 @@ def main():
     if useMinGroup:
         nr = nr.filter(F(has_parent_group="minGroup"))
 
-    if bringDown:
+    if bringDown: #this is the option to bring down the network
         pbar = tqdm(total=5)
         pbar.set_description("pinging hosts")
         pbar.colour="yellow"
         pbar.update()
 
-        nr.run(task=ping)
+        nr.run(task=ping) #this is the ping test
         pbar.set_description("configuring hostnames and ip domain name")
         pbar.update()
 
         nr.run(task=resettHostName)
         nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
-        if oneHost:
+        if oneHost: #if you want to run on one host, set this to true
             nr = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
-        if useMinGroup:
+        if useMinGroup: #reduce the number of hosts to the minimum required for the test
             nr = nr.filter(F(has_parent_group="minGroup"))
 
         pbar.set_description("resetting interfaces")
         pbar.update()
 
-        nr.run(task=resetter)
+        nr.run(task=resetter) #this is the resetter function
 
         pbar.set_description("done resetting interfaces")
         pbar.update()
 
-    elif testNew:
+    elif testNew: #if you want to test the new code, set this to true
         pass
 
-    else:
+    else: #runns the settup
         pbar = tqdm(total=3)
         nr.run(task=ping)
         pbar.colour="yellow"
@@ -92,7 +93,7 @@ def main():
         
         pbar.set_description("configging HSRP")
         pbar.update()
-        nr.run(task=hsrpPair)
+        nr.run(task=hsrpPair) #runns the hsrp pair setup
 
 
     #pbar.set_description("saving running config to start config")

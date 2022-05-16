@@ -1,19 +1,15 @@
 from tqdm import tqdm
 import os
-import time
-def ping(node):
-    #ping test
+#? probably no need for progress bar
+def ping(node): #this is the ping test
     pbar=tqdm(total=1)
     pbar.set_description(f"ping {node.host.hostname}")
-    response = os.popen(f"ping {node.host.hostname}").read()
-    if "Received = 4" in response:
+    response = os.popen(f"ping {node.host.hostname}").read() #pings the host from the ssh server
+    if "Received = 4" in response: #if the ping test was successful
         pbar.colour="green"
         pbar.update()
-        time.sleep(0.2)
         pbar.close()
-    else:
+    else: #if the ping test was not successful
         pbar.colour="red"
         pbar.update()
-        time.sleep(0.2)
-    time.sleep(0.2)
     pbar.leave = False
