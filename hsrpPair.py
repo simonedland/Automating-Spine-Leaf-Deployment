@@ -77,6 +77,7 @@ def hsrpPair(node): #main function of this script
         
 
         #? remember that the vlan interface should not be advertised to the spines bechause it should be tunneled
+        #! REWRITE THE TRACKING TO DO BOOLEAN AND INTERFACE TRACKING IN LISTS
         commandList=[]
         for x in cdpNeigbourDirections:
             if "spine" in x["name"]:
