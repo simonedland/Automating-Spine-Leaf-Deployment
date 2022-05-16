@@ -1,14 +1,12 @@
-#todo:
-#find out what ip it should use (can probably use some code from microsegment.py and/or subbnetter.py and also base the desision of host.yaml group name)
-#find out what interface to apply the ip to (here too)
-#find out what vlan to use (security)
-#implement preemptive on BOTH sides
+#TODO:
+#!find out what vlan to use (security)
 #implement priority decrementing based on interfaces
 #use CDP to find out what interfaces are connected to what
 #ignore STP due to the switches only beeing connected to one another unless the server is switched this means that i can use portfast
 #trunking the interfaces
-#some of the information might be usefull to save for the tunneling but then again i want to make it modular to prevent having to change the code in difrent places then where the issue is
+#?some of the information might be usefull to save for the tunneling but then again i want to make it modular to prevent having to change the code in difrent places then where the issue is
 
+from nornir_utils.plugins.functions import print_result
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from Subbnetter import subbnetter
 
@@ -59,21 +57,41 @@ def hsrpPair(node):
         relevantSubnet=subbnetList[0][node.host['switchpair']-1]
 
         #checking it he connected leaf is greater than the current leaf
-        if connectedLeafNr>LeafNr:
-            print("connected leaf is greater than the current leaf")
-            #gets the correct ip in the relevant subnet
-            vlanIp=(f"{relevantSubnet['subbnetID'].split('.')[0]}.{relevantSubnet['subbnetID'].split('.')[1]}.{relevantSubnet['subbnetID'].split('.')[2]}.{2}") #probably not the best way to do this, should just modify the last octet directly
-            print(f"i wil therefor get the ip {vlanIp}")
-            
+        if connectedLeafNr>LeafNr: #!low leaf
+            vlanIp=(relevantSubnet['subbnetID'][:-1]+"2") #changes the last number in the subnet to 2
+            leafPriority=105
 
-        else:
-            print("connected leaf is smaller than the current leaf")
-            print(f"i wil therefor get the ip {relevantSubnet['subbnetID'].split('.')[0]}.{relevantSubnet['subbnetID'].split('.')[1]}.{relevantSubnet['subbnetID'].split('.')[2]}.{3}") #probably not the best way to do this
+        else: #!high leaf
+            vlanIp = relevantSubnet['subbnetID'][:-1]+"3"
+            leafPriority=100
             
-
+        
+        standbyIp = relevantSubnet['subbnetID'][:-1]+"1"
 
         print("i am leaf",LeafNr)
         print("i am connected to leaf",connectedLeafNr, "\n")
+
+
+        #TODO:
+        #add all the interfaces pointing to spines to a tracking list
+        #this is to decrement the priority of the hsrp
+        #track 1 interface G0/0 line-protocol
+        #no track 1
+        
+
+
+        #!fix vlan 10 you probably just have to add it in the 
+        #? remember that the vlan interface should not be advertised to the spines bechause it should be tunneled
+        commandList=[]
+        for x in cdpNeigbourDirections:
+            if "spine" in x:
+                print(x)
+                
+        commandList.extend([f"vlan 1", f"interface vlan 1", f"ip address {vlanIp} 255.255.255.0" ,f"standby 1 ip {standbyIp}", f"standby 1 preempt", f"standby 1 priority {leafPriority}", f"no sh", f"exit"])
+
+        test = node.run(task=netmiko_send_config, config_commands=commandList)
+        print_result(test)
+
     #print(switchpair)
     
 

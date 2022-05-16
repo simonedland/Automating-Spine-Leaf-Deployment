@@ -43,11 +43,14 @@ def resetter(node):
 
     #this needs some work
     commandList = []
+    #print(interfacesNapalm["interfaces"])
     for i in interfacesNapalm["interfaces"]:
         if i != sshInterface:
+            if "Vlan" in i:
+                commandList.extend(["interface " + i , f"no ip add" ,"no shutdown", "no port channel", "no channel-group",f"no standby 1 ip ", f"no standby 1 preempt", f"no standby 1 priority", "no ip ospf 1 area 0", "no description"])
             commandList.extend(["interface " + i , "no shutdown", "no port channel", "no channel-group", "switchport", "no ip ospf 1 area 0", "no description", "switchport mode access", "switchport access vlan 1"])
         else:
-            commandList.extend(["interface " + i , "no switchport", "no ip ospf 1 area 0", "description ssh"])
+            commandList.extend(["interface " + i , "no switchport", "description ssh"])
 
 
 
