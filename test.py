@@ -1,9 +1,11 @@
 #import my own functions
+from lib2to3.pytree import Leaf
 from microsegmenter import MicroSegmenter
 from CopRunStart import SaveRunningToStart
 from pingTest import ping
 from resett import resetter, resettHostName
 from hsrpPair import hsrpPair
+from VPNMesh import vpnMaker
 
 
 #import other functions
@@ -40,13 +42,13 @@ def main():
     bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
-    testNew=False #if you want to test the new code, set this to true
+    testNew=True #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
         nr = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
     if useMinGroup:
-        nr = nr.filter(F(has_parent_group="minGroup"))
+        nr = nr.filter(has_parent_group="minGroup")
 
     if bringDown: #this is the option to bring down the network
         pbar = tqdm(total=5)
@@ -74,10 +76,13 @@ def main():
         pbar.update()
 
     elif testNew: #if you want to test the new code, set this to true
-        pass
+        pbar = tqdm(total=1)
+        Nr = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
+        nr.run(task=vpnMaker, NrOfLeafs=Nr) #this is the vpn mesh function
 
     else: #runns the settup
         pbar = tqdm(total=3)
+        
         nr.run(task=ping)
         pbar.colour="yellow"
 
