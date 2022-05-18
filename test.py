@@ -24,8 +24,10 @@ import time
 #figgure out how to use redundancy with the routers
 #where to putt DHCP server if eaven needed
 #add a command counter and a average commands per second counter
+#!DHCP FAILOVER
 #livestream telemetry
 #argument for having the link between the switches = if someone want single link
+#L2TP VPN
 
 #note to self:
 #CDP should be disabled after deployment is done
@@ -33,6 +35,7 @@ import time
 #i am not going to be using VPC due to my computer not having the capacity to emulate it
 
 #optional: tftp ssh config deployment using option 82 (optional)
+#optional: mac adress reserve ip adress based
 #optional: client side almoaste equal settup, only difrence is in host. yaml file
 
 startTime=time.time() #this is the start time of the program
