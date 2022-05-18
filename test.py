@@ -82,7 +82,6 @@ def main():
 
     else: #runns the settup
         pbar = tqdm(total=3)
-        
         nr.run(task=ping)
         pbar.colour="yellow"
 
@@ -96,7 +95,7 @@ def main():
         
         pbar.set_description("configging HSRP")
         pbar.update()
-        nr.run(task=hsrpPair) #runns the hsrp pair setup
+        nr.run(task=hsrpPair) #runns the hsrp pair setup (should filter this to only runn on leafs)
 
 
     #pbar.set_description("saving running config to start config")
