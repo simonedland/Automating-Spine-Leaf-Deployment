@@ -39,12 +39,15 @@ def resetter(node): #main function of this script
     pbar1.update()
 
     #!this needs some work due to not beeing modular
-    commandList = [f"no track 1","no track 2", "no track 3", "no track 4", "no router eigrp 1"] #this is the list of commands to run
+    commandList = [f"no track 1","no track 2", "no track 3", "no track 4", "no router eigrp 1",f"no router ospf 1"] #this is the list of commands to run
     for i in interfacesNapalm["interfaces"]: #for every interface in the napalm interface information
         if i != sshInterface:
             if "Vlan" in i: #if the interface is a vlan
                 commandList.extend(["interface " + i , f"no ip add" ,"no shutdown", f"no standby 1 ip ", f"no standby 1 preempt", f"no standby 1 priority", f"no standby 1 track 1", "no description"])
             
+            elif "Tunnel" in i: #if the interface is a loopback
+                commandList.extend(["interface " + i , f"no ip add" , f"no tunnel source", f"no destination", f"exit", f"no int {i}"])
+
             elif "Loop" in i:#if the interface is a loopback
                 commandList.extend(["interface " + i , f"no ip add" ,"no shutdown"])
             

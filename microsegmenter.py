@@ -110,8 +110,7 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
         
         bar.set_description(f"{node.host}: sending commands")
         bar.update()
-        test=node.run(task=netmiko_send_config, config_commands=commandlist)
-        print_result(test)
+        node.run(task=netmiko_send_config, config_commands=commandlist)
     
     bar.set_description(f"{node.host}: done")
     bar.colour="green"

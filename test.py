@@ -28,6 +28,9 @@ import time
 #livestream telemetry
 #argument for having the link between the switches = if someone want single link
 #L2TP VPN
+#redo the storage of the running config and interface config in adition to the cdp
+#maby store it in the nornir object
+
 
 #note to self:
 #CDP should be disabled after deployment is done
@@ -80,8 +83,9 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
         pbar = tqdm(total=1)
-        Nr = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
-        nr.run(task=vpnMaker, NrOfLeafs=Nr) #this is the vpn mesh function
+        leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
+        spines = len(nr.inventory.children_of_group("spine"))
+        nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
 
     else: #runns the settup
         pbar = tqdm(total=3)
@@ -101,8 +105,8 @@ def main():
         nr.run(task=hsrpPair) #runns the hsrp pair setup (should filter this to only runn on leafs)
 
 
-    #pbar.set_description("saving running config to start config")
-    #nr.run(task=SaveRunningToStart)
+    pbar.set_description("saving running config to start config")
+    nr.run(task=SaveRunningToStart)
 
 
     pbar.colour="green"
