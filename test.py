@@ -45,7 +45,7 @@ def main():
     bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
-    testNew=True #if you want to test the new code, set this to true
+    testNew=False #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:

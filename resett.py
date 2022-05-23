@@ -39,7 +39,7 @@ def resetter(node): #main function of this script
     pbar1.update()
 
     #!this needs some work due to not beeing modular
-    commandList = [f"no track 1","no track 2", "no track 3", "no track 4", "no router ospf 1"] #this is the list of commands to run
+    commandList = [f"no track 1","no track 2", "no track 3", "no track 4", "no router eigrp 1"] #this is the list of commands to run
     for i in interfacesNapalm["interfaces"]: #for every interface in the napalm interface information
         if i != sshInterface:
             if "Vlan" in i: #if the interface is a vlan

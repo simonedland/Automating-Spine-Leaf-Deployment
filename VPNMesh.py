@@ -1,4 +1,6 @@
 #TODO
+#?HSRP tunnel from to?
+
 #find out what ip to asign to the tunnel interface(s?)
 #? take the ip in the tunnel vlan and assign the ip that matches the leaf number to the tunnel interface(s?)
 
