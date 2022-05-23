@@ -24,12 +24,17 @@ from nornir_utils.plugins.functions import print_result
 #loop on the spines
 #loop on the leafs
 
+#make one subbnet per leaf 
+
 #base the tunnel ip on the leaf id
+
+#if leafnr of the one you are on is higher then the one you are trying to connect to choose the lower one
+#just brute force it to begin with
 
 def vpnMaker(node, NrOfLeafs, NrOfSpines):
     tunnelLan=[]
-    for x in range(0,9):
-        tunnelLan.append(subbnetter(nettwork=f"10.3.{x}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":NrOfLeafs},]))
+    for x in range(0,NrOfLeafs): #not very modular and not very efficient in adition not very elegant either
+        tunnelLan.append(subbnetter(nettwork=f"10.3.{x}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
 
     subbnetList=[]
     for x in range(0,9): #makes 10 subbnets
@@ -49,20 +54,25 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
                 if subbnetList[i][LeafNr] != subbnetList[i][j]:
                     FromIp = (f"{subbnetList[i][LeafNr]['subbnetID'].split('.')[0]}.{subbnetList[i][LeafNr]['subbnetID'].split('.')[1]}.{subbnetList[i][LeafNr]['subbnetID'].split('.')[2]}.{int(subbnetList[i][LeafNr]['subbnetID'].split('.')[3])+2}")
                     toIp = (f"{subbnetList[i][j]['subbnetID'].split('.')[0]}.{subbnetList[i][j]['subbnetID'].split('.')[1]}.{subbnetList[i][j]['subbnetID'].split('.')[2]}.{int(subbnetList[i][j]['subbnetID'].split('.')[3])+2}")
-                    tunnelIp = (f"{tunnelLan[i][j]['subbnetID'].split('.')[0]}.{tunnelLan[i][j]['subbnetID'].split('.')[1]}.{tunnelLan[i][j]['subbnetID'].split('.')[2]}.{int(tunnelLan[i][j]['subbnetID'].split('.')[3])+LeafNr+1}")
-                    print(f"{i} {j} {counter}")
-                    counter+=1
+                    tunnelIp = (f"{tunnelLan[i][j]['subbnetID'].split('.')[0]}.{tunnelLan[i][j]['subbnetID'].split('.')[1]}.{tunnelLan[i][j]['subbnetID'].split('.')[2]}.{int(tunnelLan[i][j]['subbnetID'].split('.')[3])+1}")
 
                     commandList.append(f"interface tunnel {counter}")
-                    commandList.append(f"description VPNMesh tunnel {counter}")
                     commandList.append(f"tunnel source {FromIp}")
                     commandList.append(f"tunnel destination {toIp}")
                     commandList.append(f"ip address {tunnelIp} {tunnelLan[i][j]['mask']}")
-                    commandList.append(f"exit")
-                    commandList.append(f"router ospf 1")
-                    commandList.append(f"network {tunnelIp} {tunnelLan[i][j]['mask']} area 0")
+                    commandList.append(f"ip ospf 1 a 0")
                     commandList.append(f"exit")
 
-        print(commandList)
-        test = node.run(task=netmiko_send_config, config_commands=commandList)
-        print_result(test)
+                    print(f"ip address {tunnelIp} {tunnelLan[i][j]['mask']} {LeafNr+1} from {FromIp} to {toIp}")
+                    
+                counter+=1
+
+
+        print("\n")
+        #print(LeafNr)
+        #for x in commandList:
+        #    print(x)
+
+        #print(commandList)
+        #test = node.run(task=netmiko_send_config, config_commands=commandList)
+        #print_result(test)
