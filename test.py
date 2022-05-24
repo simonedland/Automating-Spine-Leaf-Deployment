@@ -6,7 +6,7 @@ from pingTest import ping
 from resett import resetter, resettHostName
 from hsrpPair import hsrpPair
 from VPNMesh import vpnMaker
-from CDPControll import *
+from CDPControll import TurnOfCDP, TurnOnCDP
 
 
 #import other functions
@@ -48,7 +48,7 @@ def main():
     bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
-    testNew=True #if you want to test the new code, set this to true
+    testNew=False #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
@@ -57,7 +57,7 @@ def main():
         nr = nr.filter(has_parent_group="minGroup")
 
     if bringDown: #this is the option to bring down the network
-        pbar = tqdm(total=5)
+        pbar = tqdm(total=7)
         pbar.set_description("pinging hosts")
         pbar.colour="yellow"
         pbar.update()
@@ -65,6 +65,11 @@ def main():
         nr.run(task=ping) #this is the ping test
         pbar.set_description("configuring hostnames and ip domain name")
         pbar.update()
+
+        pbar.set_description("turning on cdp")
+        nr.run(task=TurnOnCDP) #turn on CDP
+        pbar.update()
+
 
         nr.run(task=resettHostName)
         nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
@@ -81,16 +86,29 @@ def main():
         pbar.set_description("done resetting interfaces")
         pbar.update()
 
+        pbar.set_description("turning off cdp")
+        nr.run(task=TurnOfCDP) #turn on CDP
+        pbar.update()
+
     elif testNew: #if you want to test the new code, set this to true
         pbar = tqdm(total=2)
-        leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
-        spines = len(nr.inventory.children_of_group("spine"))
-        nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        pbar.colour="yellow"
+        pbar.update()
 
     else: #runns the settup
-        pbar = tqdm(total=3)
-        nr.run(task=ping)
+        pbar = tqdm(total=5)
         pbar.colour="yellow"
+
+        pbar.set_description("pinging hosts")
+        nr.run(task=ping)
+        pbar.update()
+
+
+        pbar.set_description("turning on cdp")
+        test = nr.run(task=TurnOnCDP) #turn on CDP
+        print_result(test)
+        pbar.update()
+
 
         pbar.set_description("configuring hostnames and ip domain name")
         pbar.update()
@@ -104,6 +122,14 @@ def main():
         pbar.update()
         nr.run(task=hsrpPair) #runns the hsrp pair setup (should filter this to only runn on leafs)
 
+        leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
+        spines = len(nr.inventory.children_of_group("spine"))
+        nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+
+
+        pbar.set_description("turning off cdp")
+        nr.run(task=TurnOfCDP) #turn on CDP
+        pbar.update()
 
 
     #pbar.set_description("saving running config to start config")
