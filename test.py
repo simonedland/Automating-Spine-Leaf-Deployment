@@ -31,7 +31,6 @@ import time
 #redo the storage of the running config and interface config in adition to the cdp
 #maby store it in the nornir object
 
-
 #note to self:
 #CDP should be disabled after deployment is done
 #this is bechause it is recomended by the Cisco documentation
