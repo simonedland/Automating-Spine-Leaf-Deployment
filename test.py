@@ -58,32 +58,28 @@ def main():
 
     if bringDown: #this is the option to bring down the network
         pbar = tqdm(total=7)
-        pbar.set_description("pinging hosts")
         pbar.colour="yellow"
-        pbar.update()
-
-        nr.run(task=ping) #this is the ping test
-        pbar.set_description("configuring hostnames and ip domain name")
         pbar.update()
 
         pbar.set_description("turning on cdp")
         nr.run(task=TurnOnCDP) #turn on CDP
         pbar.update()
 
+        pbar.set_description("pinging hosts")
+        nr.run(task=ping) #this is the ping test
+        pbar.update()
 
+        pbar.set_description("configuring hostnames and ip domain name")
         nr.run(task=resettHostName)
         nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
         if oneHost: #if you want to run on one host, set this to true
             nr = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
         if useMinGroup: #reduce the number of hosts to the minimum required for the test
             nr = nr.filter(F(has_parent_group="minGroup"))
-
-        pbar.set_description("resetting interfaces")
         pbar.update()
 
+        pbar.set_description("resetting interfaces")
         nr.run(task=resetter) #this is the resetter function
-
-        pbar.set_description("done resetting interfaces")
         pbar.update()
 
         pbar.set_description("turning off cdp")
@@ -96,35 +92,45 @@ def main():
         pbar.update()
 
     else: #runns the settup
-        pbar = tqdm(total=5)
+        pbar = tqdm(total=8)
         pbar.colour="yellow"
 
         pbar.set_description("pinging hosts")
         nr.run(task=ping)
         pbar.update()
 
+        pbar.set_description("resetting host names")
+        nr.run(task=resettHostName)
+        nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
+        if oneHost: #if you want to run on one host, set this to true
+            nr = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
+        if useMinGroup: #reduce the number of hosts to the minimum required for the test
+            nr = nr.filter(F(has_parent_group="minGroup"))
+        pbar.update()
+
 
         pbar.set_description("turning on cdp")
-        test = nr.run(task=TurnOnCDP) #turn on CDP
-        print_result(test)
+        nr.run(task=TurnOnCDP) #turn on CDP
         pbar.update()
 
-
-        pbar.set_description("configuring hostnames and ip domain name")
-        pbar.update()
-
+        pbar.set_description("configuring EIGRP underlay")
         nr.run(task=MicroSegmenter,SegmentationIps="10.0",
             SpineHostName="spine", 
             LeafHostname="leaf", 
             IpDomainName="simon")
+        pbar.update()
+
         
         pbar.set_description("configging HSRP")
-        pbar.update()
         nr.run(task=hsrpPair) #runns the hsrp pair setup (should filter this to only runn on leafs)
+        pbar.update()
 
+
+        pbar.set_description("Setting up VPN Mesh")
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
         nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        pbar.update()
 
 
         pbar.set_description("turning off cdp")
