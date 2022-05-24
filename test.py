@@ -7,6 +7,7 @@ from resett import resetter, resettHostName
 from hsrpPair import hsrpPair
 from VPNMesh import vpnMaker
 from CDPControll import TurnOfCDP, TurnOnCDP
+from EdlgeLeafConfig import ConfigEdgeLeaf
 
 
 #import other functions
@@ -47,7 +48,7 @@ def main():
     bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
-    testNew=False #if you want to test the new code, set this to true
+    testNew=True #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
@@ -87,6 +88,7 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
         pbar = tqdm(total=2)
+        nr.run(task=ConfigEdgeLeaf)
         pbar.colour="yellow"
         pbar.update()
 
