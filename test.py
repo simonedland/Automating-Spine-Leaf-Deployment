@@ -6,6 +6,7 @@ from pingTest import ping
 from resett import resetter, resettHostName
 from hsrpPair import hsrpPair
 from VPNMesh import vpnMaker
+from CDPControll import *
 
 
 #import other functions
