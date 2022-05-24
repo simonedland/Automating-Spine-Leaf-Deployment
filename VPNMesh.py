@@ -1,3 +1,4 @@
+from cmath import nan
 from Subbnetter import subbnetter
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from nornir_utils.plugins.functions import print_result
@@ -30,11 +31,61 @@ from nornir_utils.plugins.functions import print_result
 
 #if leafnr of the one you are on is higher then the one you are trying to connect to choose the lower one
 #just brute force it to begin with
+#3 dim list
+#1 dim switch
+#2 dim subbnet
+#3 dim...
+#4 ???
 
 def vpnMaker(node, NrOfLeafs, NrOfSpines):
     tunnelLan=[]
     for x in range(0,NrOfLeafs): #not very modular and not very efficient in adition not very elegant either
         tunnelLan.append(subbnetter(nettwork=f"10.3.{x}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
+
+    iplist=[
+            [[nan,"0.1","0.5","0.9","0.13","0.17"]],#[0,0,0,0,0,0],[0,0,0,0,0,0]],
+            [["0.2",nan,"0.21","0.25","0.29","0.33"]],#[0,0,0,0,0,0],[0,0,0,0,0,0]],
+            [["0.6","0.22",nan,"0.37","0.41","0.45"]],#[0,0,0,0,0,0],[0,0,0,0,0,0]],
+            [["0.10","0.26","0.38",nan,"0.49","0.53"]],#[0,0,0,0,0,0],[0,0,0,0,0,0]],
+            [["0.14","0.30","0.42","0.50",nan,"0.57"]],#[0,0,0,0,0,0],[0,0,0,0,0,0]],
+            [["0.18","0.34","0.46","0.54","0.58",nan]],#[0,0,0,0,0,0],[0,0,0,0,0,0]],
+            ]
+
+
+    NewIpList = []
+    for Dim1 in range(0,NrOfLeafs):
+        NewIpList.append([])
+        for Dim2 in range(0,NrOfSpines):
+            NewIpList[Dim1].append([])
+
+            Horisontal=False
+            for Dim3 in range(0,NrOfLeafs):
+                if Dim3 == Dim1:
+                    NewIpList[Dim1][Dim2].append("nan")
+                    Horisontal=True
+                else:
+
+                    if Dim1 == 0:
+                        if NewIpList[Dim1][Dim2][-1]=="nan":
+                            NewIpList[Dim1][Dim2].append(f"{Dim2}.1")
+                        else:
+                            prev = NewIpList[Dim1][Dim2][-1]
+                            NewIpList[Dim1][Dim2].append(f"{prev.split('.')[0]}.{int(prev.split('.')[1])+4}")
+                    
+                    else:
+                        if Horisontal:
+                            if NewIpList[Dim1][Dim2][-1]=="nan":
+                                NewIpList[Dim1][Dim2].append(f"{NewIpList[Dim1-1][Dim2][-1].split('.')[0]}.{int(NewIpList[Dim1-1][Dim2][-1].split('.')[1])+4}")
+                            else:
+                                NewIpList[Dim1][Dim2].append(NewIpList[Dim1][Dim2][-1].split('.')[0]+"."+str(int(NewIpList[Dim1][Dim2][-1].split('.')[1])+4))
+
+                        else:
+                            NewIpList[Dim1][Dim2].append(NewIpList[Dim3][Dim2][Dim1].split('.')[0]+"."+str(int(NewIpList[Dim3][Dim2][Dim1].split('.')[1])+1))
+    #print(NewIpList)
+    #print("\n")
+    #for x in NewIpList:
+    #    print(x)
+
 
     subbnetList=[]
     for x in range(0,9): #makes 10 subbnets
@@ -54,7 +105,8 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
                 if subbnetList[i][LeafNr] != subbnetList[i][j]:
                     FromIp = (f"{subbnetList[i][LeafNr]['subbnetID'].split('.')[0]}.{subbnetList[i][LeafNr]['subbnetID'].split('.')[1]}.{subbnetList[i][LeafNr]['subbnetID'].split('.')[2]}.{int(subbnetList[i][LeafNr]['subbnetID'].split('.')[3])+2}")
                     toIp = (f"{subbnetList[i][j]['subbnetID'].split('.')[0]}.{subbnetList[i][j]['subbnetID'].split('.')[1]}.{subbnetList[i][j]['subbnetID'].split('.')[2]}.{int(subbnetList[i][j]['subbnetID'].split('.')[3])+2}")
-                    tunnelIp = (f"{tunnelLan[i][j]['subbnetID'].split('.')[0]}.{tunnelLan[i][j]['subbnetID'].split('.')[1]}.{tunnelLan[i][j]['subbnetID'].split('.')[2]}.{int(tunnelLan[i][j]['subbnetID'].split('.')[3])+1}")
+                    
+                    tunnelIp = f"10.3.{NewIpList[LeafNr][i][j]}"
 
                     commandList.append(f"interface tunnel {counter}")
                     commandList.append(f"tunnel source {FromIp}")
@@ -63,8 +115,8 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
                     commandList.append(f"ip ospf 1 a 0")
                     commandList.append(f"exit")
 
-                    print(f"ip address {tunnelIp} {tunnelLan[i][j]['mask']} {LeafNr+1} from {FromIp} to {toIp}")
-                    
+                    print(f"ip address {tunnelIp} {tunnelLan[i][j]['mask']} {LeafNr+1} from {FromIp} to {toIp} {counter} {i} {j}")
+
                 counter+=1
 
 
@@ -73,6 +125,6 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
         #for x in commandList:
         #    print(x)
 
-        #print(commandList)
-        #test = node.run(task=netmiko_send_config, config_commands=commandList)
-        #print_result(test)
+        print(commandList)
+        test = node.run(task=netmiko_send_config, config_commands=commandList)
+        print_result(test)

@@ -52,7 +52,7 @@ def main():
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
-        nr = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
+        nr = nr.filter(name="leaf1.cmh") #this is the nornir object with only one host
     if useMinGroup:
         nr = nr.filter(has_parent_group="minGroup")
 
@@ -85,7 +85,7 @@ def main():
         pbar = tqdm(total=1)
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
-        nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        nr.run(task=vpnMaker, NrOfLeafs=6, NrOfSpines=3) #this is the vpn mesh function #!CHANGE THIS BACK to leafs and spines
 
     else: #runns the settup
         pbar = tqdm(total=3)
