@@ -10,20 +10,19 @@ from VPNMesh import vpnMaker
 
 #import other functions
 from nornir import InitNornir
+from nornir_utils.plugins.functions import print_result
 from nornir.core.filter import F
 from tqdm import tqdm
 import time
 
 #todo:
 #enable CDP at the start of the script
-#expand on the resetter function to reset the vlans
 #figgure out how to use vpc
-#make a vpn tunnel maker
 #configg the routers/edge leafs connected to WAN
 #! tricky hsrp on the gateway leafs and touters
 #figgure out how to use redundancy with the routers
 #where to putt DHCP server if eaven needed
-#add a command counter and a average commands per second counter
+#add a command counter and a average commands per second counter #?threads add the total to a file??
 #!DHCP FAILOVER
 #livestream telemetry
 #argument for having the link between the switches = if someone want single link
@@ -82,10 +81,10 @@ def main():
         pbar.update()
 
     elif testNew: #if you want to test the new code, set this to true
-        pbar = tqdm(total=1)
+        pbar = tqdm(total=2)
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
-        nr.run(task=vpnMaker, NrOfLeafs=6, NrOfSpines=3) #this is the vpn mesh function #!CHANGE THIS BACK to leafs and spines
+        nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
 
     else: #runns the settup
         pbar = tqdm(total=3)
@@ -103,6 +102,7 @@ def main():
         pbar.set_description("configging HSRP")
         pbar.update()
         nr.run(task=hsrpPair) #runns the hsrp pair setup (should filter this to only runn on leafs)
+
 
 
     #pbar.set_description("saving running config to start config")
