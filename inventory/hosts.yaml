@@ -58,12 +58,10 @@ router1.cmh:
     groups:
         - router
         - edge
-    data:
-        switchpair: 3
+
 router2.cmh:
     hostname: 10.100.0.11
     groups:
         - router
         - edge
-    data:
-        switchpair: 3
+

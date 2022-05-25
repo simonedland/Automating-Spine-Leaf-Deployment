@@ -47,7 +47,7 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=False #this is the option to bring down the network
+    bringDown=True #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
     testNew=True #if you want to test the new code, set this to true
@@ -98,7 +98,7 @@ def main():
 
 
     else: #runns the settup
-        pbar = tqdm(total=8)
+        pbar = tqdm(total=9)
         pbar.colour="yellow"
 
         pbar.set_description("pinging hosts")
@@ -138,8 +138,12 @@ def main():
         nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
         pbar.update()
 
+
+        pbar.set_description("configuring edge leafs")
         edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
         edgeNodes.run(task=ConfigEdgeLeaf)
+        pbar.update()
+
 
         pbar.set_description("turning off cdp")
         nr.run(task=TurnOfCDP) #turn on CDP
