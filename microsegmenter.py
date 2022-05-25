@@ -27,7 +27,7 @@ def subbnetMicroSegmentListMaker(SegmentationIps):
 
 
 
-def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHostname="leaf", IpDomainName="simon"): #this is the function that will be called by the nornir plugin. the segmentation ips only support assigning the first two octets of the ip.
+def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHostname="leaf", IpDomainName="simon", UseOSPF=False): #this is the function that will be called by the nornir plugin. the segmentation ips only support assigning the first two octets of the ip.
 
     bar=tqdm(total=4, desc =str(node.host)) #this is the progress bar
 
@@ -81,13 +81,16 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
                 MyIp=(f"{relevantSubbnet['broadcast'].split('.')[0]}.{relevantSubbnet['broadcast'].split('.')[1]}.{relevantSubbnet['broadcast'].split('.')[2]}.{int(relevantSubbnet['broadcast'].split('.')[3])-1}")#places it self one IP under the broadcast
                 
                 #prepaires the list of commands needed to add itself to eigrp and find the correct ip adress in the microsegment
-                commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"router eigrp 1",f"network {relevantSubbnet['subbnetID']} {relevantSubbnet['mask']}"])
+                if UseOSPF:
+                    commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"ip ospf 1 a 0"])
+                else:
+                    commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"router eigrp 1",f"network {relevantSubbnet['subbnetID']} {relevantSubbnet['mask']}"])
 
         #runns the list of commands and prints the result
         bar.set_description(f"{node.host}: sending commands")
         bar.update()
-        node.run(task=netmiko_send_config, config_commands=commandlist) #runs the command list
-
+        node.run(task=netmiko_send_config, config_commands=commandlist)
+        
 
     elif f"hostname {SpineHostName}" in node.host["self"]:
         LenOfHostName=len(SpineHostName)
@@ -106,12 +109,15 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
             relevantSubbnet=listOfSubbnets[SpineNr-1][leafNr-1]
             MyIp=(f"{relevantSubbnet['subbnetID'].split('.')[0]}.{relevantSubbnet['subbnetID'].split('.')[1]}.{relevantSubbnet['subbnetID'].split('.')[2]}.{int(relevantSubbnet['subbnetID'].split('.')[3])+1}")
             
-            commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"router eigrp 1",f"network {relevantSubbnet['subbnetID']} {relevantSubbnet['mask']}"])
+            if UseOSPF:
+                commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"ip ospf 1 a 0"])
+            else:
+                commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"router eigrp 1",f"network {relevantSubbnet['subbnetID']} {relevantSubbnet['mask']}"])
         
         bar.set_description(f"{node.host}: sending commands")
         bar.update()
         node.run(task=netmiko_send_config, config_commands=commandlist)
-    
+
     else:
         bar.set_description(f"{node.host}: probably a router that does not need EIGRP")
         bar.update()
