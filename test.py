@@ -87,10 +87,13 @@ def main():
         pbar.update()
 
     elif testNew: #if you want to test the new code, set this to true
-        pbar = tqdm(total=2)
-        nr.run(task=ConfigEdgeLeaf)
-        pbar.colour="yellow"
-        pbar.update()
+        #pbar = tqdm(total=2)
+        #nr.run(task=ConfigEdgeLeaf)
+        #pbar.colour="yellow"
+        #pbar.update()
+
+        nr.run(task=TurnOnCDP) #turn on CDP
+        nr.run(task=TurnOfCDP) #turn on CDP
 
     else: #runns the settup
         pbar = tqdm(total=8)
