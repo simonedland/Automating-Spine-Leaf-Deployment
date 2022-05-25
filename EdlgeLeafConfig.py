@@ -12,15 +12,14 @@ from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 
 def ConfigEdgeLeaf(node):
     #this is the configuration of the edge leafs
-    #node.run(task=MicroSegmenter,
-    #        SegmentationIps="10.4",
-    #        SpineHostName="router", 
-    #        LeafHostname="leaf", 
-    #        IpDomainName="simon",
-    #        UseOSPF=True,)
+    node.run(task=MicroSegmenter,
+            SegmentationIps="10.4",
+            SpineHostName="router", 
+            LeafHostname="leaf", 
+            IpDomainName="simon",
+            UseOSPF=True,)
     
     node.host["self"] = node.run(task=netmiko_send_command, command_string=("sh run"), enable=True).result
-
 
     #if it is a router i should add the nat translation and the default gateway
     if "hostname router" in node.host["self"]:

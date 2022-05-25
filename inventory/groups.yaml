@@ -9,7 +9,7 @@ spine:
     netmiko:
       extras:
         fast_cli: False
-        conn_timeout: 100
+        conn_timeout: 1000
         secret: Password
     napalm:
       extras:
@@ -21,7 +21,7 @@ leaf:
     netmiko:
       extras:
         fast_cli: False
-        conn_timeout: 100
+        conn_timeout: 1000
         secret: Password
     napalm:
       extras:
@@ -33,7 +33,7 @@ router:
     netmiko:
       extras:
         fast_cli: False
-        conn_timeout: 100
+        conn_timeout: 1000
         secret: Password
     napalm:
       extras:
@@ -45,7 +45,7 @@ minGroup:
     netmiko:
       extras:
         fast_cli: False
-        conn_timeout: 100
+        conn_timeout: 1000
         secret: Password
     napalm:
       extras:
@@ -57,7 +57,7 @@ edge:
     netmiko:
       extras:
         fast_cli: False
-        conn_timeout: 100
+        conn_timeout: 1000
         secret: Password
     napalm:
       extras:
