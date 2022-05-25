@@ -104,16 +104,18 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
                     leafNr = int(neigbor["name"][LenOfNeigborName:LenOfNeigborName+1])
             else:
                 pass #if it is not a leaf it will do nothing
-            locationOfQuote=node.host["self"].find(f"hostname {SpineHostName}")
-            SpineNr=int(node.host["self"][locationOfQuote+LenOfHostName+9:locationOfQuote+LenOfHostName+11].replace(" ",""))
-            relevantSubbnet=listOfSubbnets[SpineNr-1][leafNr-1]
-            MyIp=(f"{relevantSubbnet['subbnetID'].split('.')[0]}.{relevantSubbnet['subbnetID'].split('.')[1]}.{relevantSubbnet['subbnetID'].split('.')[2]}.{int(relevantSubbnet['subbnetID'].split('.')[3])+1}")
-            
-            if UseOSPF:
-                commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"ip ospf 1 a 0"])
-            else:
-                commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"router eigrp 1",f"network {relevantSubbnet['subbnetID']} {relevantSubbnet['mask']}"])
-        
+            try:
+                locationOfQuote=node.host["self"].find(f"hostname {SpineHostName}")
+                SpineNr=int(node.host["self"][locationOfQuote+LenOfHostName+9:locationOfQuote+LenOfHostName+11].replace(" ",""))
+                relevantSubbnet=listOfSubbnets[SpineNr-1][leafNr-1]
+                MyIp=(f"{relevantSubbnet['subbnetID'].split('.')[0]}.{relevantSubbnet['subbnetID'].split('.')[1]}.{relevantSubbnet['subbnetID'].split('.')[2]}.{int(relevantSubbnet['subbnetID'].split('.')[3])+1}")
+                
+                if UseOSPF:
+                    commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"ip ospf 1 a 0"])
+                else:
+                    commandlist.extend([f"int {neigbor['interface']}",f"no switch",f"no sh",f"ip add {MyIp} {relevantSubbnet['mask']}",f"router eigrp 1",f"network {relevantSubbnet['subbnetID']} {relevantSubbnet['mask']}"])
+            except:
+                print("CDP error")
         bar.set_description(f"{node.host}: sending commands")
         bar.update()
         node.run(task=netmiko_send_config, config_commands=commandlist)

@@ -32,8 +32,7 @@ def resetter(node): #main function of this script
     pbar1.set_description(f"doing basic router configgs")
 
     #can make this part way faster by making a single command list and then running it all at once
-    test = node.run(task=netmiko_send_config, config_commands=["ip routing","ip route 192.168.1.51 255.255.255.255 10.100.0.100", "ip route 0.0.0.0 0.0.0.0 192.168.1.1", "no access-list 1","noip nat inside source list 1 interface g0/2 overload"]) #this is the basic config for the router to connect to the ssh server
-    print_result(test)
+    node.run(task=netmiko_send_config, config_commands=["ip routing","ip route 192.168.1.51 255.255.255.255 10.100.0.100", "no ip route 0.0.0.0 0.0.0.0 192.168.1.1", "no access-list 1","no ip nat inside source list 1 interface g0/2 overload"]) #this is the basic config for the router to connect to the ssh server
 
     pbar1.set_description(f"sending all interface reset commands")
     pbar1.colour="yellow"
@@ -53,13 +52,12 @@ def resetter(node): #main function of this script
                 commandList.extend(["interface " + i , f"no ip add" ,"no shutdown"])
             
             else: #if the interface is a normal interface
-                commandList.extend(["interface " + i , "no shutdown", "no channel-group", "switchport", "no description", "switchport mode access", "switchport access vlan 1","ip nat outside","ip nat inside"])
+                commandList.extend(["interface " + i , "no shutdown", "no channel-group", "switchport", "no description", "switchport mode access", "switchport access vlan 1","no ip nat outside","no ip nat inside", "no ip address"])
         
         else: #if the interface is connected to the ssh server
             commandList.extend(["interface " + i , "no switchport", "description ssh"])
 
-    test = node.run(task=netmiko_send_config, config_commands=commandList) #this is the final command list to run
-    print_result(test) #prints the result of the command list
+    node.run(task=netmiko_send_config, config_commands=commandList) #this is the final command list to run
 
     pbar1.set_description(f"done resetting interfaces")
     pbar1.colour="green"
