@@ -1,17 +1,13 @@
 en
 conf t
-hostname leaf5
+hostname router2
 enable secret Password
 username Username secret Password
 ip domain-name simon
 ip routing
-interface GigabitEthernet1/0
-switchport
-int g1/1
-no switchport
-ip address 10.100.0.8 255.255.255.0
+int g0/3
+ip address 10.100.0.11 255.255.255.0
 description ssh
-ip ospf 1 a 0
 exit
 crypto key generate rsa
 yes
@@ -33,3 +29,4 @@ ip address 10.100.0.9 255.255.255.0
 do cop run start
 
 
+ip route 192.168.1.51 255.255.255.255 10.100.0.100

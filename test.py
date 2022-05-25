@@ -32,6 +32,8 @@ import time
 #redo the storage of the running config and interface config in adition to the cdp
 #maby store it in the nornir object
 
+#!improove the resetter to reset the standby and logic groups
+
 #note to self:
 #CDP should be disabled after deployment is done
 #this is bechause it is recomended by the Cisco documentation
@@ -87,13 +89,14 @@ def main():
         pbar.update()
 
     elif testNew: #if you want to test the new code, set this to true
-        #pbar = tqdm(total=2)
-        #nr.run(task=ConfigEdgeLeaf)
-        #pbar.colour="yellow"
-        #pbar.update()
 
-        nr.run(task=TurnOnCDP) #turn on CDP
-        nr.run(task=TurnOfCDP) #turn on CDP
+
+        edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
+        pbar = tqdm(total=2)
+        edgeNodes.run(task=ConfigEdgeLeaf)
+        pbar.colour="yellow"
+        pbar.update()
+
 
     else: #runns the settup
         pbar = tqdm(total=8)

@@ -13,6 +13,7 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
         tunnelLan.append(subbnetter(nettwork=f"10.3.{x}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
 
     #!WARNING THIS IS TRASH CODE BUT IT WORKS
+    #!EXPLAIN HOW THE LISTS ARE CONNECTED IN THE PAPER
     #it constructs the tunnelLan list whewre the first dimention is leafs
     #and the second dimention is the subnets related to the ip connected to the spines
     #and the third dimention is the hosts in the subnet meaning it has the same amount that there is leafs

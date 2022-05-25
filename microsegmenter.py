@@ -112,6 +112,11 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
         bar.update()
         node.run(task=netmiko_send_config, config_commands=commandlist)
     
+    else:
+        bar.set_description(f"{node.host}: probably a router that does not need EIGRP")
+        bar.update()
+        time.sleep(1)
+
     bar.set_description(f"{node.host}: done")
     bar.colour="green"
     bar.update()

@@ -41,16 +41,26 @@ def hsrpPair(node): #main function of this script
     #check if self is in a switchpair and if so what is the switch in the pair
     try:
         switchpair=node.host['switchpair']
-        spine=False
+        if "hostname leaf" in node.host["run"]:
+            leaf=True
+        else:
+            leaf=False
+            pbar.colour="yellow"
+            pbar.set_description(f"{node.host}: it is a router not needing config") #writes to the progress bar
+            pbar.update() #updates the progress bar
+            time.sleep(1)
+            pbar.colour="green"
+            pbar.update()
+
     except: #if not in a switchpair meaning it is a spine
         pbar.set_description(f"{node.host}: spine") #writes to the progress bar
         pbar.update() #updates the progress bar
         time.sleep(1)
         pbar.colour="green"
         pbar.update() #finishes the progress bar
-        spine=True
+        leaf=False
 
-    if spine==False: #if the node is not a spine
+    if leaf==True: #if the node is not a spine
         #finds out what switchnumber the node is (code from subbnetter)
         locationOfQuote=node.host["run"].find(f"hostname leaf")
         LeafNr=int(node.host["run"][locationOfQuote+13:locationOfQuote+15].replace(" ","").replace("\n",""))
