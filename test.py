@@ -9,7 +9,6 @@ from VPNMesh import vpnMaker
 from CDPControll import TurnOfCDP, TurnOnCDP
 from EdlgeLeafConfig import ConfigEdgeLeaf
 
-
 #import other functions
 from nornir import InitNornir
 from nornir_utils.plugins.functions import print_result
@@ -17,21 +16,13 @@ from nornir.core.filter import F
 from tqdm import tqdm
 import time
 
-#todo:
-#enable CDP at the start of the script
-#figgure out how to use vpc
+#in progress
 #configg the routers/edge leafs connected to WAN
-#! tricky hsrp on the gateway leafs and touters
-#figgure out how to use redundancy with the routers
+
+#todo:
 #where to putt DHCP server if eaven needed
 #add a command counter and a average commands per second counter #?threads add the total to a file??
 #!DHCP FAILOVER
-#livestream telemetry
-#argument for having the link between the switches = if someone want single link
-#L2TP VPN
-#redo the storage of the running config and interface config in adition to the cdp
-#maby store it in the nornir object
-
 #!improove the resetter to reset the standby and logic groups
 
 #note to self:
@@ -39,9 +30,17 @@ import time
 #this is bechause it is recomended by the Cisco documentation
 #i am not going to be using VPC due to my computer not having the capacity to emulate it
 
+#!no time for this
+#figgure out how to use vpc
+#L2TP VPN
+#redo the storage of the running config and interface config in adition to the cdp
+#maby store it in the nornir object
 #optional: tftp ssh config deployment using option 82 (optional)
 #optional: mac adress reserve ip adress based
 #optional: client side almoaste equal settup, only difrence is in host. yaml file
+#optional: add a function to check if the router is connected to the WAN
+#optional: telemerty thinggy
+
 
 startTime=time.time() #this is the start time of the program
 
@@ -50,7 +49,7 @@ def main():
     bringDown=True #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
-    testNew=True #if you want to test the new code, set this to true
+    testNew=False #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
