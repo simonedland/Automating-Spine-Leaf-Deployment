@@ -47,7 +47,7 @@ def main():
     bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
-    testNew=True #if you want to test the new code, set this to true
+    testNew=False #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
@@ -90,13 +90,13 @@ def main():
 
 
         pbar = tqdm(total=1)
-        leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
-        spines = len(nr.inventory.children_of_group("spine"))
-        test=nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
+        test=edgeNodes.run(task=ConfigEdgeLeaf) #this is the vpn mesh function
 
         tot=0
         avgTime=0
         for x in test:
+            pass
             print(test[x].result)
             tot+=test[x].result[0]
             avgTime+=test[x].result[1]
@@ -113,6 +113,7 @@ def main():
         pbar = tqdm(total=9)
         pbar.colour="yellow"
 
+        tot=0
 
         pbar.set_description("pinging hosts")
         PingavgTime=0
@@ -186,18 +187,43 @@ def main():
         pbar.set_description("Setting up VPN Mesh")
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
-        nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        VPNcpount = nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        VPNavgTime=0
+        for x in VPNcpount:
+            print(VPNcpount[x].result)
+            tot+=VPNcpount[x].result[0]
+            VPNavgTime+=VPNcpount[x].result[1]
+        print(tot)
+        VPNavgTime=VPNavgTime/len(VPNcpount)
+        print(VPNavgTime)
         pbar.update()
 
 
         pbar.set_description("configuring edge leafs")
         edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
-        edgeNodes.run(task=ConfigEdgeLeaf)
+        Edgecount = edgeNodes.run(task=ConfigEdgeLeaf)
+        EdgeavgTime = 0
+        for x in Edgecount:
+            print(Edgecount[x].result)
+            tot+=Edgecount[x].result[0]
+            EdgeavgTime+=Edgecount[x].result[1]
+        print(tot)
+        EdgeavgTime=EdgeavgTime/len(Edgecount)
+        print(EdgeavgTime)
         pbar.update()
 
 
         pbar.set_description("turning off cdp")
         nr.run(task=TurnOfCDP) #turn on CDP
+        ofCdpcount = nr.run(task=TurnOfCDP)
+        ofCdpavgTime = 0
+        for x in ofCdpcount:
+            print(ofCdpcount[x].result)
+            tot+=ofCdpcount[x].result[0]
+            ofCdpavgTime+=ofCdpcount[x].result[1]
+        print(tot)
+        ofCdpavgTime=ofCdpavgTime/len(ofCdpcount)
+        print(ofCdpavgTime)
         pbar.update()
 
 

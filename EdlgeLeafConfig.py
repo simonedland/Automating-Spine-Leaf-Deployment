@@ -1,6 +1,7 @@
-from distutils.cmd import Command
 from microsegmenter import MicroSegmenter
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
+import time
+from nornir_utils.plugins.functions import print_result
 
 
 #a function that should configgure the edge leafs to be the default gateway for the WAN
@@ -11,22 +12,26 @@ from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 
 
 def ConfigEdgeLeaf(node):
+    StartTime = time.time()
     #this is the configuration of the edge leafs
-    node.run(task=MicroSegmenter,
+    Segmenter = node.run(task=MicroSegmenter,
             SegmentationIps="10.4",
             SpineHostName="router", 
             LeafHostname="leaf", 
             IpDomainName="simon",
             UseOSPF=True,)
-    
+
     node.host["self"] = node.run(task=netmiko_send_command, command_string=("sh run"), enable=True).result
 
     #if it is a router i should add the nat translation and the default gateway
     if "hostname router" in node.host["self"]:
-        #locationOfQuote=node.host["self"].find(f"hostname router")
-        #LeafNr=int(node.host["self"][locationOfQuote+15:locationOfQuote+16].replace(" ","").replace("\n",""))
-        #this is the configuration of the edge routers
         #!not very modular
         CommandList=[]
         CommandList.extend(["router ospf 1" ,"int g0/2","ip addres dhcp","ip nat outside", "ip ospf 1 a 0", "int g0/0","ip nat inside","int g0/1","ip nat inside", "exit", "access-list 1 permit any", "ip nat inside source list 1 interface g0/2 overload"])
         node.run(task=netmiko_send_config, config_commands=CommandList)
+    
+    else:
+        CommandList=[]
+
+    EndTime = time.time()
+    return len(CommandList)+Segmenter[0].result[0], EndTime-StartTime
