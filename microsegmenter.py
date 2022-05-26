@@ -40,10 +40,12 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
     bar.colour="yellow"
     bar.set_description(f"{node.host}: facts gathered 1 of 2") #writes to the progress bar
     bar.update() #updates the progress bar
+    StartTimeGatherInfo=time.time() #this is the start time of the gather info function
     node.host["intf"] = node.run(task=netmiko_send_command, command_string=("sh cdp nei de")).result #this is the interface information
     bar.set_description(f"{node.host}: facts gathered 2 of 2") #writes to the progress bar
     bar.update() #updates the progress bar
     node.host["self"] = node.run(task=netmiko_send_command, command_string=("sh run"), enable=True).result #this is the running config
+    EndTimeGatherInfo=time.time() #this is the end time of the gather info function
     
     
     #finds all the locations of the keywords device id and interface
@@ -91,7 +93,9 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
         #runns the list of commands and prints the result
         bar.set_description(f"{node.host}: sending commands")
         bar.update()
+        StartCommand = time.time()
         node.run(task=netmiko_send_config, config_commands=commandlist)
+        EndCommand = time.time()
         
 
     elif f"hostname {SpineHostName}" in node.host["self"]:
@@ -120,13 +124,17 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
                 print("CDP error")
         bar.set_description(f"{node.host}: sending commands")
         bar.update()
+        StartCommand = time.time()
         node.run(task=netmiko_send_config, config_commands=commandlist)
+        EndCommand = time.time()
 
     else:
         bar.set_description(f"{node.host}: probably a router that does not need EIGRP")
         bar.update()
         time.sleep(1)
         commandlist=[]
+        StartCommand = 0
+        EndCommand = 0
 
     bar.set_description(f"{node.host}: done")
     bar.colour="green"
@@ -134,4 +142,4 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
     time.sleep(1)
 
     EndTime=time.time()
-    return len(commandlist)+2, EndTime-StartTime #returns the length of the commandlist and the time it took to run the commands
+    return len(commandlist)+2, EndTime-StartTime, EndTimeGatherInfo-StartTimeGatherInfo, EndCommand-StartCommand

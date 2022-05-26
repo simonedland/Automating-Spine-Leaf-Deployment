@@ -17,13 +17,13 @@ from tqdm import tqdm
 import time
 
 #todo:
+#display stats at the end of the script
+#display average commands per second
 #where to putt DHCP server if eaven needed
 #!DHCP FAILOVER
 #!improove the resetter to reset the standby and logic groups
 
 #note to self:
-#CDP should be disabled after deployment is done
-#this is bechause it is recomended by the Cisco documentation
 #i am not going to be using VPC due to my computer not having the capacity to emulate it
 
 #!no time for this
@@ -37,13 +37,13 @@ import time
 #optional: add a function to check if the router is connected to the WAN
 #optional: telemerty thinggy
 
-#lock if not comma??
+
 
 startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=False #this is the option to bring down the network
+    bringDown=True #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
     testNew=False #if you want to test the new code, set this to true
@@ -106,8 +106,6 @@ def main():
         pbar.update()
 
 
-
-
     else: #runns the settup
         pbar = tqdm(total=9)
         pbar.colour="yellow"
@@ -143,19 +141,25 @@ def main():
 
         pbar.set_description("turning on cdp")
         CDPavgTime = 0
+        CDPaverageComandTime = 0
         CDPCount = nr.run(task=TurnOnCDP)
         for x in CDPCount:
             print(CDPCount[x].result)
             CDPavgTime+=CDPCount[x].result[1]
             tot+=CDPCount[x].result[0]
+            CDPaverageComandTime+=CDPCount[x].result[2]
         print(tot)
         CDPavgTime=CDPavgTime/len(CDPCount)
         print(CDPavgTime)
+        CDPaverageComandTime=CDPaverageComandTime/len(CDPCount)
+        print(CDPaverageComandTime)
         pbar.update()
 
 
         pbar.set_description("configuring EIGRP underlay")
         EIGRPavgTime = 0
+        GatherAverageTime = 0
+        CommandAverage=0
         EIGRPcount = nr.run(task=MicroSegmenter,SegmentationIps="10.0",
             SpineHostName="spine", 
             LeafHostname="leaf", 
@@ -164,22 +168,36 @@ def main():
             print(EIGRPcount[x].result)
             EIGRPavgTime+=EIGRPcount[x].result[1]
             tot+=EIGRPcount[x].result[0]
+            Gathertime=EIGRPcount[x].result[2]
+            CommandAverage+=EIGRPcount[x].result[3]
         print(tot)
         EIGRPavgTime=EIGRPavgTime/len(EIGRPcount)
         print(EIGRPavgTime)
+        GatherAverageTime=Gathertime/len(EIGRPcount)
+        print(GatherAverageTime)
+        CommandAverage=CommandAverage/len(EIGRPcount)
+        print(CommandAverage)
         pbar.update()
 
         
         pbar.set_description("configging HSRP")
         HSRPavgTime = 0
+        HSRPGatherTime = 0
+        HSRPaverageComandTime = 0
         HSRPcount = nr.run(task=hsrpPair)
         for x in HSRPcount:
             print(HSRPcount[x].result)
             HSRPavgTime+=HSRPcount[x].result[1]
             tot+=HSRPcount[x].result[0]
+            HSRPGatherTime+=HSRPcount[x].result[2]
+            HSRPaverageComandTime+=HSRPcount[x].result[3]
         print(tot)
         HSRPavgTime=HSRPavgTime/len(HSRPcount)
         print(HSRPavgTime)
+        HSRPGatherTime=HSRPGatherTime/len(HSRPcount)
+        print(HSRPGatherTime)
+        HSRPaverageComandTime=HSRPaverageComandTime/len(HSRPcount)
+        print(HSRPaverageComandTime)
         pbar.update()
 
 
@@ -187,14 +205,22 @@ def main():
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
         VPNcpount = nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        VPNGathertime = 0
+        VPNcommandTime = 0
         VPNavgTime=0
         for x in VPNcpount:
             print(VPNcpount[x].result)
             tot+=VPNcpount[x].result[0]
             VPNavgTime+=VPNcpount[x].result[1]
+            VPNGathertime+=VPNcpount[x].result[2]
+            VPNcommandTime+=VPNcpount[x].result[3]
         print(tot)
         VPNavgTime=VPNavgTime/len(VPNcpount)
         print(VPNavgTime)
+        VPNGathertime=VPNGathertime/len(VPNcpount)
+        print(VPNGathertime)
+        VPNcommandTime=VPNcommandTime/len(VPNcpount)
+        print(VPNcommandTime)
         pbar.update()
 
 

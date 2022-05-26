@@ -53,7 +53,9 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
     pbar.update()
     pbar.set_description(f"{node.host} gathering info")
 
+    GatherTimeStart = time.time()
     node.host["run"] = node.run(task=netmiko_send_command, command_string=("sh run"), enable=True).result #this is the running config
+    GatherTimeEnd = time.time()
 
     pbar.update()
     pbar.set_description(f"{node.host} sending config")
@@ -83,7 +85,9 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
 
                 counter+=1 #adds 1 to the counter
 
+        CommandStartTime=time.time() #sets the time when the command starts
         node.run(task=netmiko_send_config, config_commands=commandList) #sends the config to the leaf
+        CommandEndTime=time.time() #sets the time when the command ends
         
 
         pbar.colour = "green"
@@ -97,4 +101,4 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
         pbar.set_description(f"{node.host} not a leaf")
 
     endTime = time.time()
-    return len(commandList)+1, endTime-startTime
+    return len(commandList)+1, endTime-startTime, GatherTimeEnd-GatherTimeStart, CommandEndTime-CommandStartTime

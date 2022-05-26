@@ -18,6 +18,7 @@ def hsrpPair(node): #main function of this script
         ])) #makes 1 subbnets with 255 hosts each
 
     #constructs the interface information and running config information
+    GatherStartTime=time.time()
     pbar.colour="yellow"
     pbar.set_description(f"{node.host}: facts gathered 1 of 2") #writes to the progress bar
     pbar.update() #updates the progress bar
@@ -26,6 +27,7 @@ def hsrpPair(node): #main function of this script
     pbar.set_description(f"{node.host}: facts gathered 2 of 2") #writes to the progress bar
     pbar.update() #updates the progress bar
     node.host["run"] = node.run(task=netmiko_send_command, command_string=("sh run"), enable=True).result #this is the running config
+    GatherEndTime=time.time()
 
     hostnames = [i for i in range(len(node.host["cdp"])) if node.host["cdp"].startswith("Device ID:", i)] #finds the location of the device id
     interfaces = [i for i in range(len(node.host["cdp"])) if node.host["cdp"].startswith("Interface:", i)] #finds the location of the interface
@@ -104,7 +106,9 @@ def hsrpPair(node): #main function of this script
         pbar.colour="yellow"
         pbar.set_description(f"{node.host}: sending configgs") #writes to the progress bar
         pbar.update() #updates the progress bar
+        CommandStartTime=time.time()
         node.run(task=netmiko_send_config, config_commands=commandList) #sends the configs
+        CommandEndTime=time.time()
         pbar.colour="green"
         pbar.set_description(f"{node.host}: done") #writes to the progress bar
         pbar.update() #updates the progress bar
@@ -114,7 +118,7 @@ def hsrpPair(node): #main function of this script
 
     EndTime=time.time()
 
-    return len(commandList)+2, EndTime-StartTime
+    return len(commandList)+2, EndTime-StartTime, GatherEndTime-GatherStartTime, CommandEndTime-CommandStartTime
 
     #print(switchpair)
     
