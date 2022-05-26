@@ -16,9 +16,6 @@ from nornir.core.filter import F
 from tqdm import tqdm
 import time
 
-#in progress
-#configg the routers/edge leafs connected to WAN
-
 #todo:
 #where to putt DHCP server if eaven needed
 #add a command counter and a average commands per second counter #?threads add the total to a file??
