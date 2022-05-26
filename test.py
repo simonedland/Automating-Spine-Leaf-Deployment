@@ -43,7 +43,7 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=True #this is the option to bring down the network
+    bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
     testNew=False #if you want to test the new code, set this to true
@@ -184,19 +184,27 @@ def main():
         HSRPavgTime = 0
         HSRPGatherTime = 0
         HSRPaverageComandTime = 0
+        HSRPGatherd=0
+        HSRPCommands=0
         HSRPcount = nr.run(task=hsrpPair)
         for x in HSRPcount:
             print(HSRPcount[x].result)
             HSRPavgTime+=HSRPcount[x].result[1]
             tot+=HSRPcount[x].result[0]
-            HSRPGatherTime+=HSRPcount[x].result[2]
-            HSRPaverageComandTime+=HSRPcount[x].result[3]
+            NodeHSRPTime=HSRPcount[x].result[2]
+            if NodeHSRPTime != 0:
+                HSRPGatherTime+=HSRPcount[x].result[2]
+                HSRPGatherd+=1
+            NodeHSRPTime=HSRPcount[x].result[3]
+            if NodeHSRPTime != 0:
+                HSRPaverageComandTime+=HSRPcount[x].result[3]
+                HSRPCommands+=1
         print(tot)
         HSRPavgTime=HSRPavgTime/len(HSRPcount)
         print(HSRPavgTime)
-        HSRPGatherTime=HSRPGatherTime/len(HSRPcount)
+        HSRPGatherTime=HSRPGatherTime/HSRPGatherd
         print(HSRPGatherTime)
-        HSRPaverageComandTime=HSRPaverageComandTime/len(HSRPcount)
+        HSRPaverageComandTime=HSRPaverageComandTime/HSRPCommands
         print(HSRPaverageComandTime)
         pbar.update()
 
@@ -208,18 +216,26 @@ def main():
         VPNGathertime = 0
         VPNcommandTime = 0
         VPNavgTime=0
+        VPNGatherd=0
+        VPNcommands=0
         for x in VPNcpount:
             print(VPNcpount[x].result)
             tot+=VPNcpount[x].result[0]
             VPNavgTime+=VPNcpount[x].result[1]
-            VPNGathertime+=VPNcpount[x].result[2]
-            VPNcommandTime+=VPNcpount[x].result[3]
+            NodeVPNTime=VPNcpount[x].result[2]
+            if NodeVPNTime != 0:
+                VPNGathertime+=VPNcpount[x].result[2]
+                VPNGatherd+=1
+            NodeVPNTime=VPNcpount[x].result[3]
+            if NodeVPNTime != 0:
+                VPNcommandTime+=VPNcpount[x].result[3]
+                VPNcommands+=1
         print(tot)
         VPNavgTime=VPNavgTime/len(VPNcpount)
         print(VPNavgTime)
-        VPNGathertime=VPNGathertime/len(VPNcpount)
+        VPNGathertime=VPNGathertime/VPNGatherd
         print(VPNGathertime)
-        VPNcommandTime=VPNcommandTime/len(VPNcpount)
+        VPNcommandTime=VPNcommandTime/VPNcommands
         print(VPNcommandTime)
         pbar.update()
 
@@ -228,13 +244,21 @@ def main():
         edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
         Edgecount = edgeNodes.run(task=ConfigEdgeLeaf)
         EdgeavgTime = 0
+        EdgeGatherTime = 0
+        EdgeCommandTime = 0
         for x in Edgecount:
             print(Edgecount[x].result)
             tot+=Edgecount[x].result[0]
             EdgeavgTime+=Edgecount[x].result[1]
+            EdgeGatherTime+=Edgecount[x].result[2]
+            EdgeCommandTime+=Edgecount[x].result[3]
         print(tot)
         EdgeavgTime=EdgeavgTime/len(Edgecount)
         print(EdgeavgTime)
+        EdgeGatherTime=EdgeGatherTime/len(Edgecount)
+        print(EdgeGatherTime)
+        EdgeCommandTime=EdgeCommandTime/len(Edgecount)
+        print(EdgeCommandTime)
         pbar.update()
 
 

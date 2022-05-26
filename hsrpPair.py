@@ -115,6 +115,10 @@ def hsrpPair(node): #main function of this script
 
     else: #if the node is a leaf
         commandList=[]
+        GatherEndTime = 0
+        GatherStartTime = 0
+        CommandEndTime = 0
+        CommandStartTime = 0
 
     EndTime=time.time()
 

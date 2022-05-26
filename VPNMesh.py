@@ -99,6 +99,12 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
         pbar.colour = "green"
         pbar.update()
         pbar.set_description(f"{node.host} not a leaf")
+        GatherTimeEnd=0
+        GatherTimeStart=0
+        CommandEndTime=0
+        CommandStartTime=0
+        
+
 
     endTime = time.time()
     return len(commandList)+1, endTime-startTime, GatherTimeEnd-GatherTimeStart, CommandEndTime-CommandStartTime

@@ -36,6 +36,8 @@ def ConfigEdgeLeaf(node):
     
     else:
         CommandList=[]
+        CommandTimeStart=0
+        CommandTimeEnd=0
 
     EndTime = time.time()
     return len(CommandList)+Segmenter[0].result[0], EndTime-StartTime, (GatherTimeEnd-GatherTimeStart)+Segmenter[0].result[2], (CommandTimeEnd-CommandTimeStart)+Segmenter[0].result[3]
