@@ -87,9 +87,13 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
 
-        pbar = tqdm(total=1)
 
-        test=nr.run(task=hsrpPair)
+
+        pbar = tqdm(total=1)
+        leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
+        spines = len(nr.inventory.children_of_group("spine"))
+        test=nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+
         tot=0
         avgTime=0
         for x in test:
@@ -100,8 +104,9 @@ def main():
         avgTime=avgTime/len(test)
         print(avgTime)
 
-
         pbar.update()
+
+
 
 
     else: #runns the settup

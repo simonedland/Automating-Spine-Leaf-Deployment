@@ -1,10 +1,12 @@
 from Subbnetter import subbnetter
 from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
 from tqdm import tqdm
-
+import time
 
 def vpnMaker(node, NrOfLeafs, NrOfSpines):
     
+    startTime = time.time()
+
     pbar = tqdm(total=3)
     pbar.colour = "yellow"
 
@@ -70,7 +72,7 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
                     FromIp = (f"{subbnetList[i][LeafNr]['subbnetID'].split('.')[0]}.{subbnetList[i][LeafNr]['subbnetID'].split('.')[1]}.{subbnetList[i][LeafNr]['subbnetID'].split('.')[2]}.{int(subbnetList[i][LeafNr]['subbnetID'].split('.')[3])+2}") #sets the ip of the leaf that is the source of the tunnel by using the same script that makes the EIGRP fabric
                     toIp = (f"{subbnetList[i][j]['subbnetID'].split('.')[0]}.{subbnetList[i][j]['subbnetID'].split('.')[1]}.{subbnetList[i][j]['subbnetID'].split('.')[2]}.{int(subbnetList[i][j]['subbnetID'].split('.')[3])+2}") #sets the ip of the leaf that is the destination of the tunnel
                     
-                    tunnelIp = f"10.3.{NewIpList[LeafNr][i][j]}" #sets the ip of the tunnel #!THIS WAS PAIN IN THE ASS TO FIND OUT HOW TO DO THIS. ╰(*°▽°*)╯
+                    tunnelIp = f"10.3.{NewIpList[LeafNr][i][j]}" #sets the ip of the tunnel #!THIS WAS PAIN IN THE ASS TO FIND OUT HOW TO DO. ╰(*°▽°*)╯
 
                     commandList.append(f"interface tunnel {counter}") #adds the command to the command list
                     commandList.append(f"tunnel source {FromIp}")
@@ -89,6 +91,10 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
         pbar.set_description(f"{node.host} done")
 
     else:
+        commandList=[]
         pbar.colour = "green"
         pbar.update()
         pbar.set_description(f"{node.host} not a leaf")
+
+    endTime = time.time()
+    return len(commandList)+1, endTime-startTime
