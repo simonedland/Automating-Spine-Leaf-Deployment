@@ -38,6 +38,7 @@ import time
 #optional: add a function to check if the router is connected to the WAN
 #optional: telemerty thinggy
 
+#lock if not comma??
 
 startTime=time.time() #this is the start time of the program
 
@@ -46,7 +47,7 @@ def main():
     bringDown=False #this is the option to bring down the network
     oneHost=False #if you want to run on one host, set this to true
     useMinGroup=False #reduce the number of hosts to the minimum required for the test
-    testNew=False #if you want to test the new code, set this to true
+    testNew=True #if you want to test the new code, set this to true
 
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
     if oneHost:
@@ -86,10 +87,13 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
 
-        pbar = tqdm(total=2)
-        edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
-        edgeNodes.run(task=ConfigEdgeLeaf)
-        pbar.colour="yellow"
+        pbar = tqdm(total=3)
+        pbar.set_description("turning on cdp")
+        nr.run(task=TurnOnCDP) #turn on CDP
+        pbar.update()
+
+        pbar.set_description("turning off cdp")
+        nr.run(task=TurnOfCDP) #turn on CDP
         pbar.update()
 
 
