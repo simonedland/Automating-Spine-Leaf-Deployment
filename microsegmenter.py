@@ -28,6 +28,8 @@ def subbnetMicroSegmentListMaker(SegmentationIps):
 
 
 def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHostname="leaf", IpDomainName="simon", UseOSPF=False): #this is the function that will be called by the nornir plugin. the segmentation ips only support assigning the first two octets of the ip.
+    
+    StartTime = time.time() #this is the start time of the function
 
     bar=tqdm(total=4, desc =str(node.host)) #this is the progress bar
 
@@ -124,8 +126,12 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
         bar.set_description(f"{node.host}: probably a router that does not need EIGRP")
         bar.update()
         time.sleep(1)
+        commandlist=[]
 
     bar.set_description(f"{node.host}: done")
     bar.colour="green"
     bar.update()
-    time.sleep(2)
+    time.sleep(1)
+
+    EndTime=time.time()
+    return len(commandlist)+2, EndTime-StartTime #returns the length of the commandlist and the time it took to run the commands

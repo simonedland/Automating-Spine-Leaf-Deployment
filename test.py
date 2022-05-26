@@ -8,7 +8,6 @@ from hsrpPair import hsrpPair
 from VPNMesh import vpnMaker
 from CDPControll import TurnOfCDP, TurnOnCDP
 from EdlgeLeafConfig import ConfigEdgeLeaf
-from commandCounter import initFile
 
 #import other functions
 from nornir import InitNornir
@@ -89,10 +88,19 @@ def main():
     elif testNew: #if you want to test the new code, set this to true
 
         pbar = tqdm(total=1)
-        test=nr.run(task=initFile) #turn on CDP
-        print(test["spine1.cmh"].result)
+
+        test=nr.run(task=hsrpPair)
+        tot=0
+        avgTime=0
         for x in test:
             print(test[x].result)
+            tot+=test[x].result[0]
+            avgTime+=test[x].result[1]
+        print(tot)
+        avgTime=avgTime/len(test)
+        print(avgTime)
+
+
         pbar.update()
 
 
@@ -100,34 +108,73 @@ def main():
         pbar = tqdm(total=9)
         pbar.colour="yellow"
 
+
         pbar.set_description("pinging hosts")
-        nr.run(task=ping)
+        PingavgTime=0
+        PingCount = nr.run(task=ping)
+        for x in PingCount:
+            print(PingCount[x].result)
+            PingavgTime+=PingCount[x].result[1]
+            tot+=PingCount[x].result[0]
+        print(tot)
+        PingavgTime=PingavgTime/len(PingCount)
+        print(PingavgTime)
         pbar.update()
 
+
         pbar.set_description("resetting host names")
-        nr.run(task=resettHostName)
+        HostAvghTime = 0
+        HostCount = nr.run(task=resettHostName)
+        for x in HostCount:
+            print(HostCount[x].result)
+            HostAvghTime+=HostCount[x].result[1]
+            tot+=HostCount[x].result[0]
+        print(tot)
+        HostAvghTime=HostAvghTime/len(HostCount)
+        print(HostAvghTime)
         nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
-        if oneHost: #if you want to run on one host, set this to true
-            nr = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
-        if useMinGroup: #reduce the number of hosts to the minimum required for the test
-            nr = nr.filter(F(has_parent_group="minGroup"))
         pbar.update()
 
 
         pbar.set_description("turning on cdp")
-        nr.run(task=TurnOnCDP) #turn on CDP
+        CDPavgTime = 0
+        CDPCount = nr.run(task=TurnOnCDP)
+        for x in CDPCount:
+            print(CDPCount[x].result)
+            CDPavgTime+=CDPCount[x].result[1]
+            tot+=CDPCount[x].result[0]
+        print(tot)
+        CDPavgTime=CDPavgTime/len(CDPCount)
+        print(CDPavgTime)
         pbar.update()
 
+
         pbar.set_description("configuring EIGRP underlay")
-        nr.run(task=MicroSegmenter,SegmentationIps="10.0",
+        EIGRPavgTime = 0
+        EIGRPcount = nr.run(task=MicroSegmenter,SegmentationIps="10.0",
             SpineHostName="spine", 
             LeafHostname="leaf", 
             IpDomainName="simon")
+        for x in EIGRPcount:
+            print(EIGRPcount[x].result)
+            EIGRPavgTime+=EIGRPcount[x].result[1]
+            tot+=EIGRPcount[x].result[0]
+        print(tot)
+        EIGRPavgTime=EIGRPavgTime/len(EIGRPcount)
+        print(EIGRPavgTime)
         pbar.update()
 
         
         pbar.set_description("configging HSRP")
-        nr.run(task=hsrpPair) #runns the hsrp pair setup (should filter this to only runn on leafs)
+        HSRPavgTime = 0
+        HSRPcount = nr.run(task=hsrpPair)
+        for x in HSRPcount:
+            print(HSRPcount[x].result)
+            HSRPavgTime+=HSRPcount[x].result[1]
+            tot+=HSRPcount[x].result[0]
+        print(tot)
+        HSRPavgTime=HSRPavgTime/len(HSRPcount)
+        print(HSRPavgTime)
         pbar.update()
 
 

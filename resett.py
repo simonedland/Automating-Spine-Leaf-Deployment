@@ -6,7 +6,10 @@ from tqdm import tqdm
 import time
 
 def resettHostName(node): #this is a bit of a hack, but it works
+    StartTime = time.time()
     node.run(task=netmiko_send_config, config_commands=[f"hostname {str(node.host).split('.')[0]}", "ip domain-name simon"])
+    EndTime = time.time()
+    return 2, EndTime-StartTime
 
 
 def resetter(node): #main function of this script

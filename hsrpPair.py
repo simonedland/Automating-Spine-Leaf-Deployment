@@ -9,6 +9,7 @@ import time
 #leaf host names to be numbered
 
 def hsrpPair(node): #main function of this script
+    StartTime = time.time()
     pbar = tqdm(total=4)
     subbnetList=[]
     subbnetList.append(subbnetter(nettwork=f"192.168.2.0",
@@ -107,6 +108,13 @@ def hsrpPair(node): #main function of this script
         pbar.colour="green"
         pbar.set_description(f"{node.host}: done") #writes to the progress bar
         pbar.update() #updates the progress bar
+
+    else: #if the node is a leaf
+        commandList=[]
+
+    EndTime=time.time()
+
+    return len(commandList)+2, EndTime-StartTime
 
     #print(switchpair)
     
