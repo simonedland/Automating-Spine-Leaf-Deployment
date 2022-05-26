@@ -18,7 +18,6 @@ import time
 
 #todo:
 #where to putt DHCP server if eaven needed
-#add a command counter and a average commands per second counter #?threads add the total to a file??
 #!DHCP FAILOVER
 #!improove the resetter to reset the standby and logic groups
 
