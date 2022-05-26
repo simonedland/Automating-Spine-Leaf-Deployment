@@ -28,5 +28,5 @@ def ConfigEdgeLeaf(node):
         #this is the configuration of the edge routers
         #!not very modular
         CommandList=[]
-        CommandList.extend(["ip route 8.8.8.8 255.255.255.255 192.168.1.1","router ospf 1", "default-information originate always" ,"int g0/2","ip addres dhcp","ip nat outside", "no ip ospf 1 a 0", "int g0/0","ip nat inside","int g0/1","ip nat inside", "exit", "access-list 1 permit 192.168.0.0 0.0.255.255", "ip nat inside source list 1 interface g0/2 overload"])
+        CommandList.extend(["router ospf 1" ,"int g0/2","ip addres dhcp","ip nat outside", "ip ospf 1 a 0", "int g0/0","ip nat inside","int g0/1","ip nat inside", "exit", "access-list 1 permit any", "ip nat inside source list 1 interface g0/2 overload"])
         node.run(task=netmiko_send_config, config_commands=CommandList)

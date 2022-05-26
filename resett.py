@@ -32,7 +32,7 @@ def resetter(node): #main function of this script
     pbar1.set_description(f"doing basic router configgs")
 
     #can make this part way faster by making a single command list and then running it all at once
-    node.run(task=netmiko_send_config, config_commands=["ip routing","ip route 192.168.1.51 255.255.255.255 10.100.0.100", "no ip route 8.8.8.8 255.255.255.255 192.168.1.1", "no access-list 1","no ip nat inside source list 1 interface g0/2 overload"]) #this is the basic config for the router to connect to the ssh server
+    node.run(task=netmiko_send_config, config_commands=["ip routing","ip route 192.168.1.51 255.255.255.255 10.100.0.100","no ip route 192.168.1.0 255.255.255.0 10.100.0.100", "no access-list 1","no ip nat inside source list 1 interface g0/2 overload"]) #this is the basic config for the router to connect to the ssh server
 
     pbar1.set_description(f"sending all interface reset commands")
     pbar1.colour="yellow"
