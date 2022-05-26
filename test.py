@@ -8,6 +8,7 @@ from hsrpPair import hsrpPair
 from VPNMesh import vpnMaker
 from CDPControll import TurnOfCDP, TurnOnCDP
 from EdlgeLeafConfig import ConfigEdgeLeaf
+from commandCounter import initFile
 
 #import other functions
 from nornir import InitNornir
@@ -87,13 +88,11 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
 
-        pbar = tqdm(total=3)
-        pbar.set_description("turning on cdp")
-        nr.run(task=TurnOnCDP) #turn on CDP
-        pbar.update()
-
-        pbar.set_description("turning off cdp")
-        nr.run(task=TurnOfCDP) #turn on CDP
+        pbar = tqdm(total=1)
+        test=nr.run(task=initFile) #turn on CDP
+        print(test["spine1.cmh"].result)
+        for x in test:
+            print(test[x].result)
         pbar.update()
 
 

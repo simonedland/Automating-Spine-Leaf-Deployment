@@ -5,11 +5,14 @@ import random
 
 def TurnOfCDP(node):
     node.run(task=netmiko_send_config, config_commands=["no cdp run"])
+    
+
 
 def TurnOnCDP(node): # add a bit of randomness to the speed
     Pbar = tqdm(total=100)
     node.run(task=netmiko_send_config, config_commands=["cdp run", "cdp timer 5"])
     Pbar.colour="magenta"
+
 
     
     for x in range(0, 100):
