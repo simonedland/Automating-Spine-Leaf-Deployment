@@ -17,8 +17,7 @@ from tqdm import tqdm
 import time
 
 #todo:
-#?rename variables
-#where to putt DHCP server if eaven needed
+#?Place DHCP servers in spines (*/ω＼*)
 #!DHCP FAILOVER
 #!improove the resetter to reset the standby and logic groups
 
