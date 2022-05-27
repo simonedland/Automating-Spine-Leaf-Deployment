@@ -18,7 +18,7 @@ from tqdm import tqdm
 import time
 
 #todo:
-#?Place DHCP servers in spines (*/ω＼*)
+#?Place DHCP servers in leafs (*/ω＼*)
 #!DHCP FAILOVER
 #!improove the resetter to reset the standby and logic groups
 
@@ -110,10 +110,10 @@ def main():
 
 
         pbar = tqdm(total=1)
-        Spine_Nodes = nr.filter(F(groups__contains="spine")) #this is the nornir object with only the edge nodes
+        Leaf_Nodes = nr.filter(F(groups__contains="leaf")) #this is the nornir object with only the edge nodes
         leaf_Pairs = int(len(nr.inventory.children_of_group("leaf"))/2) #this is the number of leafs
         DHCP_Pools = (subbnetter(nettwork=f"192.168.2.0",nettworkReq=[{"numberOfSubbnets":leaf_Pairs, "requiredHosts":255},]))
-        Spine_Node = Spine_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
+        Leaf_Node = Leaf_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
         
 
         pbar.update()
