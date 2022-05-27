@@ -4,6 +4,8 @@ from nornir_utils.plugins.functions import print_result
 
 
 def AddDHCPPools(node, ipconfigs, gateway="first"):
+    StartTime=time.time()
+
     """makes the command list of adding the dhcp pools with netmiko
     normaly used with my subbnetter script
     requires a list of dictionaries with the keys: subbnetID, broadcast and mask
@@ -68,5 +70,10 @@ def AddDHCPPools(node, ipconfigs, gateway="first"):
     commandlist.append(f"default-router {gateway}")
     commandlist.append(f"exit")
 
-    test=node.run(task=netmiko_send_config, config_commands=commandlist)
-    print_result(test)
+    CommandStartTime=time.time()
+    node.run(task=netmiko_send_config, config_commands=commandlist)
+    CommandEndTime=time.time()
+
+    EndTime=time.time()
+
+    return len(commandlist)+2, EndTime-StartTime , GatherEndTime-GatherStartTime, CommandEndTime-CommandStartTime
