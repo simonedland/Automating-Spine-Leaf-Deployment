@@ -44,15 +44,40 @@ startTime=time.time() #this is the start time of the program
 def main():
 
     bringDown=False #this is the option to bring down the network
-    oneHost=False #if you want to run on one host, set this to true
-    useMinGroup=False #reduce the number of hosts to the minimum required for the test
     testNew=False #if you want to test the new code, set this to true
 
+
+    tot=0
+    HostAvghTime = 0
+    hostcommands = 0
+    PingavgTime=0
+    CDPavgTime = 0
+    CDPaverageComandTime = 0
+    CDPcommands = 0
+    EdgeavgTime = 0
+    EdgeGatherTime = 0
+    EdgeCommandTime = 0
+    EdgeCommandCount=0
+    VPNGathertime = 0
+    VPNcommandTime = 0
+    VPNavgTime=0
+    VPNGatherd=0
+    VPNcommands=0
+    VPNCommandCount=0
+    EIGRPavgTime = 0
+    GatherAverageTime = 0
+    CommandAverage=0
+    EIGRPcommands = 0
+    HSRPavgTime = 0
+    HSRPGatherTime = 0
+    HSRPaverageComandTime = 0
+    HSRPGatherd=0
+    HSRPCommands=0
+    HSRPCommandCount=0
+    ofCdpavgTime = 0
+
+    
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
-    if oneHost:
-        nr = nr.filter(name="leaf1.cmh") #this is the nornir object with only one host
-    if useMinGroup:
-        nr = nr.filter(has_parent_group="minGroup")
 
     if bringDown: #this is the option to bring down the network
         pbar = tqdm(total=7)
@@ -70,10 +95,7 @@ def main():
         pbar.set_description("configuring hostnames and ip domain name")
         nr.run(task=resettHostName)
         nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
-        if oneHost: #if you want to run on one host, set this to true
-            nr = nr.filter(name="spine1.cmh") #this is the nornir object with only one host
-        if useMinGroup: #reduce the number of hosts to the minimum required for the test
-            nr = nr.filter(F(has_parent_group="minGroup"))
+
         pbar.update()
 
         pbar.set_description("resetting interfaces")
@@ -110,87 +132,63 @@ def main():
         pbar = tqdm(total=9)
         pbar.colour="yellow"
 
-        tot=0
-
         pbar.set_description("pinging hosts")
-        PingavgTime=0
         PingCount = nr.run(task=ping)
         for x in PingCount:
-            print(PingCount[x].result)
             PingavgTime+=PingCount[x].result[1]
             tot+=PingCount[x].result[0]
-        print(tot)
         PingavgTime=PingavgTime/len(PingCount)
-        print(PingavgTime)
         pbar.update()
 
 
         pbar.set_description("resetting host names")
-        HostAvghTime = 0
         HostCount = nr.run(task=resettHostName)
         for x in HostCount:
-            print(HostCount[x].result)
             HostAvghTime+=HostCount[x].result[1]
-            tot+=HostCount[x].result[0]
-        print(tot)
+            hostcommands+=HostCount[x].result[0]
+        tot+=hostcommands
         HostAvghTime=HostAvghTime/len(HostCount)
-        print(HostAvghTime)
+        hostPScommands=hostcommands/HostAvghTime
         nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
         pbar.update()
 
 
         pbar.set_description("turning on cdp")
-        CDPavgTime = 0
-        CDPaverageComandTime = 0
         CDPCount = nr.run(task=TurnOnCDP)
         for x in CDPCount:
-            print(CDPCount[x].result)
             CDPavgTime+=CDPCount[x].result[1]
-            tot+=CDPCount[x].result[0]
+            CDPcommands+=CDPCount[x].result[0]
             CDPaverageComandTime+=CDPCount[x].result[2]
-        print(tot)
+        tot+=CDPcommands
         CDPavgTime=CDPavgTime/len(CDPCount)
-        print(CDPavgTime)
         CDPaverageComandTime=CDPaverageComandTime/len(CDPCount)
-        print(CDPaverageComandTime)
+        CDPPScommands=CDPcommands/CDPavgTime
         pbar.update()
 
 
         pbar.set_description("configuring EIGRP underlay")
-        EIGRPavgTime = 0
-        GatherAverageTime = 0
-        CommandAverage=0
         EIGRPcount = nr.run(task=MicroSegmenter,SegmentationIps="10.0",
             SpineHostName="spine", 
             LeafHostname="leaf", 
             IpDomainName="simon")
         for x in EIGRPcount:
-            print(EIGRPcount[x].result)
             EIGRPavgTime+=EIGRPcount[x].result[1]
-            tot+=EIGRPcount[x].result[0]
+            EIGRPcommands+=EIGRPcount[x].result[0]
             Gathertime=EIGRPcount[x].result[2]
             CommandAverage+=EIGRPcount[x].result[3]
-        print(tot)
+        tot+=EIGRPcommands
         EIGRPavgTime=EIGRPavgTime/len(EIGRPcount)
-        print(EIGRPavgTime)
         GatherAverageTime=Gathertime/len(EIGRPcount)
-        print(GatherAverageTime)
         CommandAverage=CommandAverage/len(EIGRPcount)
-        print(CommandAverage)
+        EIGRPPScommands=EIGRPcommands/EIGRPavgTime
         pbar.update()
 
         
         pbar.set_description("configging HSRP")
-        HSRPavgTime = 0
-        HSRPGatherTime = 0
-        HSRPaverageComandTime = 0
-        HSRPGatherd=0
-        HSRPCommands=0
         HSRPcount = nr.run(task=hsrpPair)
         for x in HSRPcount:
-            print(HSRPcount[x].result)
             HSRPavgTime+=HSRPcount[x].result[1]
-            tot+=HSRPcount[x].result[0]
+            HSRPCommandCount+=HSRPcount[x].result[0]
             NodeHSRPTime=HSRPcount[x].result[2]
             if NodeHSRPTime != 0:
                 HSRPGatherTime+=HSRPcount[x].result[2]
@@ -199,13 +197,11 @@ def main():
             if NodeHSRPTime != 0:
                 HSRPaverageComandTime+=HSRPcount[x].result[3]
                 HSRPCommands+=1
-        print(tot)
+        tot+=HSRPCommandCount
         HSRPavgTime=HSRPavgTime/len(HSRPcount)
-        print(HSRPavgTime)
         HSRPGatherTime=HSRPGatherTime/HSRPGatherd
-        print(HSRPGatherTime)
         HSRPaverageComandTime=HSRPaverageComandTime/HSRPCommands
-        print(HSRPaverageComandTime)
+        HSRPPScommands=HSRPCommands/HSRPavgTime
         pbar.update()
 
 
@@ -213,14 +209,8 @@ def main():
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
         VPNcpount = nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
-        VPNGathertime = 0
-        VPNcommandTime = 0
-        VPNavgTime=0
-        VPNGatherd=0
-        VPNcommands=0
         for x in VPNcpount:
-            print(VPNcpount[x].result)
-            tot+=VPNcpount[x].result[0]
+            VPNCommandCount+=VPNcpount[x].result[0]
             VPNavgTime+=VPNcpount[x].result[1]
             NodeVPNTime=VPNcpount[x].result[2]
             if NodeVPNTime != 0:
@@ -230,49 +220,37 @@ def main():
             if NodeVPNTime != 0:
                 VPNcommandTime+=VPNcpount[x].result[3]
                 VPNcommands+=1
-        print(tot)
+        tot+=VPNCommandCount
         VPNavgTime=VPNavgTime/len(VPNcpount)
-        print(VPNavgTime)
         VPNGathertime=VPNGathertime/VPNGatherd
-        print(VPNGathertime)
         VPNcommandTime=VPNcommandTime/VPNcommands
-        print(VPNcommandTime)
+        VPNPScommands=VPNcommands/VPNavgTime
         pbar.update()
 
 
         pbar.set_description("configuring edge leafs")
         edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
         Edgecount = edgeNodes.run(task=ConfigEdgeLeaf)
-        EdgeavgTime = 0
-        EdgeGatherTime = 0
-        EdgeCommandTime = 0
         for x in Edgecount:
-            print(Edgecount[x].result)
-            tot+=Edgecount[x].result[0]
+            EdgeCommandCount+=Edgecount[x].result[0]
             EdgeavgTime+=Edgecount[x].result[1]
             EdgeGatherTime+=Edgecount[x].result[2]
             EdgeCommandTime+=Edgecount[x].result[3]
-        print(tot)
+        tot+=EdgeCommandCount
         EdgeavgTime=EdgeavgTime/len(Edgecount)
-        print(EdgeavgTime)
         EdgeGatherTime=EdgeGatherTime/len(Edgecount)
-        print(EdgeGatherTime)
         EdgeCommandTime=EdgeCommandTime/len(Edgecount)
-        print(EdgeCommandTime)
+        EdgePScommands=EdgeCommandCount/EdgeavgTime
         pbar.update()
 
 
         pbar.set_description("turning off cdp")
         nr.run(task=TurnOfCDP) #turn on CDP
         ofCdpcount = nr.run(task=TurnOfCDP)
-        ofCdpavgTime = 0
         for x in ofCdpcount:
-            print(ofCdpcount[x].result)
             tot+=ofCdpcount[x].result[0]
             ofCdpavgTime+=ofCdpcount[x].result[1]
-        print(tot)
         ofCdpavgTime=ofCdpavgTime/len(ofCdpcount)
-        print(ofCdpavgTime)
         pbar.update()
 
 
@@ -290,7 +268,20 @@ def main():
     #nr.run(task=netmiko_send_command, command_string="reload", enable=True, use_timing=True)
     #nr.run(task=netmiko_send_command, command_string="y", enable=True, use_timing=True, ignore_errors=True)
 
+    print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {PingavgTime}")
+    print(f"time spent configuring host information: {HostAvghTime}, sending a total command count of {hostcommands}, bringing back a command PS count of {hostPScommands}")
+    print(f"time spent configuring EIGRP: {EIGRPavgTime}, sending a total command count of {EIGRPcommands}, bringing back a command PS count of {EIGRPPScommands} using a average of {GatherAverageTime} on gathering information")
+    print(f"time spent configuring CDP: {CDPavgTime}, sending a total command count of {CDPcommands}, bringing back a command PS count of {CDPPScommands}")
+    print(f"time spent configuring HSRP: {HSRPavgTime}, sending a total command count of {HSRPCommandCount}, bringing back a command PS count of {HSRPPScommands}")
+    print(f"time spent configuring VPN Mesh: {VPNavgTime}, sending a total command count of {VPNCommandCount}, bringing back a command PS count of {VPNPScommands}")
+    print(f"time spent configuring edge leafs: {EdgeavgTime}, sending a total command count of {EdgeCommandCount}, bringing back a command PS count of {EdgePScommands}")
+    print(f"time spent turning off cdp: {ofCdpavgTime}")
+    print(f"total command PS: {(hostPScommands+EIGRPPScommands+CDPPScommands+HSRPPScommands+VPNPScommands+EdgePScommands)/6}")
+    print(f"total commands sent: {tot}")
+
+
+
 main() #run the main function
 
 
-print(f"\n\n\n\n\n\n\n\n\n\nthe script took {time.time()-startTime} seconds") #prints how long the script took to run
+print(f"the script took {time.time()-startTime} seconds") #prints how long the script took to run

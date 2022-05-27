@@ -19,7 +19,7 @@ def ConfigEdgeLeaf(node):
             SpineHostName="router", 
             LeafHostname="leaf", 
             IpDomainName="simon",
-            UseOSPF=True,)
+            UseOSPF=True)
 
     GatherTimeStart = time.time()
     node.host["self"] = node.run(task=netmiko_send_command, command_string=("sh run"), enable=True).result
