@@ -17,8 +17,7 @@ from tqdm import tqdm
 import time
 
 #todo:
-#display stats at the end of the script
-#display average commands per second
+#?rename variables
 #where to putt DHCP server if eaven needed
 #!DHCP FAILOVER
 #!improove the resetter to reset the standby and logic groups
@@ -162,7 +161,7 @@ def main():
         tot+=CDPcommands
         CDPavgTime=CDPavgTime/len(CDPCount)
         CDPaverageComandTime=CDPaverageComandTime/len(CDPCount)
-        CDPPScommands=CDPcommands/CDPavgTime
+        CDPPScommands=CDPcommands/CDPaverageComandTime
         pbar.update()
 
 
@@ -180,7 +179,7 @@ def main():
         EIGRPavgTime=EIGRPavgTime/len(EIGRPcount)
         GatherAverageTime=Gathertime/len(EIGRPcount)
         CommandAverage=CommandAverage/len(EIGRPcount)
-        EIGRPPScommands=EIGRPcommands/EIGRPavgTime
+        EIGRPPScommands=EIGRPcommands/CommandAverage
         pbar.update()
 
         
@@ -201,7 +200,7 @@ def main():
         HSRPavgTime=HSRPavgTime/len(HSRPcount)
         HSRPGatherTime=HSRPGatherTime/HSRPGatherd
         HSRPaverageComandTime=HSRPaverageComandTime/HSRPCommands
-        HSRPPScommands=HSRPCommands/HSRPavgTime
+        HSRPPScommands=HSRPCommandCount/HSRPaverageComandTime
         pbar.update()
 
 
@@ -224,7 +223,7 @@ def main():
         VPNavgTime=VPNavgTime/len(VPNcpount)
         VPNGathertime=VPNGathertime/VPNGatherd
         VPNcommandTime=VPNcommandTime/VPNcommands
-        VPNPScommands=VPNcommands/VPNavgTime
+        VPNPScommands=VPNCommandCount/VPNcommandTime
         pbar.update()
 
 
@@ -240,7 +239,7 @@ def main():
         EdgeavgTime=EdgeavgTime/len(Edgecount)
         EdgeGatherTime=EdgeGatherTime/len(Edgecount)
         EdgeCommandTime=EdgeCommandTime/len(Edgecount)
-        EdgePScommands=EdgeCommandCount/EdgeavgTime
+        EdgePScommands=EdgeCommandCount/EdgeCommandTime
         pbar.update()
 
 
@@ -269,12 +268,12 @@ def main():
     #nr.run(task=netmiko_send_command, command_string="y", enable=True, use_timing=True, ignore_errors=True)
 
     print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {PingavgTime}")
-    print(f"time spent configuring host information: {HostAvghTime}, sending a total command count of {hostcommands}, bringing back a command PS count of {hostPScommands}")
-    print(f"time spent configuring EIGRP: {EIGRPavgTime}, sending a total command count of {EIGRPcommands}, bringing back a command PS count of {EIGRPPScommands} using a average of {GatherAverageTime} on gathering information")
-    print(f"time spent configuring CDP: {CDPavgTime}, sending a total command count of {CDPcommands}, bringing back a command PS count of {CDPPScommands}")
-    print(f"time spent configuring HSRP: {HSRPavgTime}, sending a total command count of {HSRPCommandCount}, bringing back a command PS count of {HSRPPScommands}")
-    print(f"time spent configuring VPN Mesh: {VPNavgTime}, sending a total command count of {VPNCommandCount}, bringing back a command PS count of {VPNPScommands}")
-    print(f"time spent configuring edge leafs: {EdgeavgTime}, sending a total command count of {EdgeCommandCount}, bringing back a command PS count of {EdgePScommands}")
+    print(f"time spent configuring host information: {HostAvghTime}, sending a total command count of {hostcommands}, command PS count {hostPScommands}")
+    print(f"time spent configuring EIGRP: {EIGRPavgTime}, sending a total command count of {EIGRPcommands}, command PS count {EIGRPPScommands} using a average of {GatherAverageTime} on gathering information")
+    print(f"time spent configuring CDP: {CDPavgTime}, sending a total command count of {CDPcommands}, command PS count {CDPPScommands}")
+    print(f"time spent configuring HSRP: {HSRPavgTime}, sending a total command count of {HSRPCommandCount}, command PS count {HSRPPScommands}")
+    print(f"time spent configuring VPN Mesh: {VPNavgTime}, sending a total command count of {VPNCommandCount}, command PS count {VPNPScommands}")
+    print(f"time spent configuring edge leafs: {EdgeavgTime}, sending a total command count of {EdgeCommandCount}, command PS count {EdgePScommands}")
     print(f"time spent turning off cdp: {ofCdpavgTime}")
     print(f"total command PS: {(hostPScommands+EIGRPPScommands+CDPPScommands+HSRPPScommands+VPNPScommands+EdgePScommands)/6}")
     print(f"total commands sent: {tot}")
