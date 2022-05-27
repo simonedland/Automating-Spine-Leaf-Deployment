@@ -1,5 +1,4 @@
 #import my own functions
-from lib2to3.pytree import Leaf
 from microsegmenter import MicroSegmenter
 from CopRunStart import SaveRunningToStart
 from pingTest import ping
@@ -8,6 +7,8 @@ from hsrpPair import hsrpPair
 from VPNMesh import vpnMaker
 from CDPControll import TurnOfCDP, TurnOnCDP
 from EdlgeLeafConfig import ConfigEdgeLeaf
+from Subbnetter import subbnetter
+from DHCPControll import AddDHCPPools
 
 #import other functions
 from nornir import InitNornir
@@ -42,7 +43,7 @@ startTime=time.time() #this is the start time of the program
 def main():
 
     bringDown=False #this is the option to bring down the network
-    testNew=False #if you want to test the new code, set this to true
+    testNew=True #if you want to test the new code, set this to true
 
 
     tot=0
@@ -109,19 +110,11 @@ def main():
 
 
         pbar = tqdm(total=1)
-        Edge_Nodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
-        test=Edge_Nodes.run(task=ConfigEdgeLeaf) #this is the vpn mesh function
-
-        tot=0
-        avgTime=0
-        for x in test:
-            pass
-            print(test[x].result)
-            tot+=test[x].result[0]
-            avgTime+=test[x].result[1]
-        print(tot)
-        avgTime=avgTime/len(test)
-        print(avgTime)
+        Spine_Nodes = nr.filter(F(groups__contains="spine")) #this is the nornir object with only the edge nodes
+        leaf_Pairs = int(len(nr.inventory.children_of_group("leaf"))/2) #this is the number of leafs
+        DHCP_Pools = (subbnetter(nettwork=f"192.168.2.0",nettworkReq=[{"numberOfSubbnets":leaf_Pairs, "requiredHosts":255},]))
+        Spine_Node = Spine_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
+        
 
         pbar.update()
 
@@ -265,18 +258,19 @@ def main():
     #print("rebooting")
     #nr.run(task=netmiko_send_command, command_string="reload", enable=True, use_timing=True)
     #nr.run(task=netmiko_send_command, command_string="y", enable=True, use_timing=True, ignore_errors=True)
-
-    print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {Ping_Avg_Time}")
-    print(f"time spent configuring host information: {Host_Conf_Avg_Time}, sending a total command count of {Host_Config_command_count}, command PS count {Host_Commands_per_sec}")
-    print(f"time spent configuring EIGRP: {EIGRP_Avg_Time}, sending a total command count of {EIGRP_Command_Count}, command PS count {EIGRP_AVG_Commands_Per_Sec} using a average of {EIGRP_AVG_Gather_Time} on gathering information")
-    print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
-    print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
-    print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
-    print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
-    print(f"time spent turning off cdp: {ofCdp_AvgTime}")
-    print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6}")
-    print(f"total commands sent: {tot}")
-
+    try:
+        print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {Ping_Avg_Time}")
+        print(f"time spent configuring host information: {Host_Conf_Avg_Time}, sending a total command count of {Host_Config_command_count}, command PS count {Host_Commands_per_sec}")
+        print(f"time spent configuring EIGRP: {EIGRP_Avg_Time}, sending a total command count of {EIGRP_Command_Count}, command PS count {EIGRP_AVG_Commands_Per_Sec} using a average of {EIGRP_AVG_Gather_Time} on gathering information")
+        print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
+        print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
+        print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
+        print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
+        print(f"time spent turning off cdp: {ofCdp_AvgTime}")
+        print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6}")
+        print(f"total commands sent: {tot}")
+    except:
+        print("you are testing new")
 
 
 main() #run the main function
