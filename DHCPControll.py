@@ -1,5 +1,7 @@
 from nornir_netmiko.tasks import netmiko_send_config, netmiko_send_command
 import time
+from nornir_utils.plugins.functions import print_result
+
 
 def AddDHCPPools(node, ipconfigs, gateway="first"):
     """makes the command list of adding the dhcp pools with netmiko
@@ -28,20 +30,18 @@ def AddDHCPPools(node, ipconfigs, gateway="first"):
     locationOfQuote=node.host["run"].find(f"hostname leaf")
     LeafNr=int(node.host["run"][locationOfQuote+13:locationOfQuote+15].replace(" ","").replace("\n",""))
 
-    print(switchpair)
-
     for x in cdpNeigbourDirections: #for every neigbour in the cdp neigbour list
-            if "leaf" in x["name"]: #if the neigbour is a leaf
-                try: #try to search if the number is over 9
-                    connectedLeafNr=(int(x["name"][len(x["name"])-2:len(x["name"])])) #probably not the best way to do this
-                except: #if not over 9
-                    connectedLeafNr=(int(x["name"][len(x["name"])-1:len(x["name"])]))
+        if "leaf" in x["name"]: #if the neigbour is a leaf
+            try: #try to search if the number is over 9
+                connectedLeafNr=(int(x["name"][len(x["name"])-2:len(x["name"])])) #probably not the best way to do this
+            except: #if not over 9
+                connectedLeafNr=(int(x["name"][len(x["name"])-1:len(x["name"])]))
 
     if connectedLeafNr>LeafNr: #if the connected leaf is greater than the current leaf
-        TakeUpperHighIpRange=True #standby priority
+        TakeUpperIpRange=True #standby priority
 
     else: #if the connected leaf is less than the current leaf
-        TakeUpperHighIpRange=False
+        TakeUpperIpRange=False
 
     counter=0
     commandlist=[]
@@ -53,11 +53,20 @@ def AddDHCPPools(node, ipconfigs, gateway="first"):
     else:
         gateway=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.{int(str(ipconfigs[switchpair]['subbnetID']).split('.')[3])+1}"
 
+    if TakeUpperIpRange:
+        excludLow=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.128"
+        excludHigh=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.250"
+    else:
+        excludLow=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.10"
+        excludHigh=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.127"
+    
+        
+    commandlist.append(f"ip dhcp excluded-address {excludLow} {excludHigh}")
     commandlist.append(f"ip dhcp pool Pool")
     commandlist.append(f"network {ipconfigs[switchpair]['subbnetID']} {ipconfigs[switchpair]['mask']}")
     commandlist.append(f"dns-server 8.8.8.8")
     commandlist.append(f"default-router {gateway}")
     commandlist.append(f"exit")
 
-    print(commandlist)
-    #node.run(task=netmiko_send_config, config_commands=commandlist)
+    test=node.run(task=netmiko_send_config, config_commands=commandlist)
+    print_result(test)
