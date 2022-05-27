@@ -47,33 +47,33 @@ def main():
 
 
     tot=0
-    HostAvghTime = 0
-    hostcommands = 0
-    PingavgTime=0
-    CDPavgTime = 0
-    CDPaverageComandTime = 0
-    CDPcommands = 0
-    EdgeavgTime = 0
-    EdgeGatherTime = 0
-    EdgeCommandTime = 0
-    EdgeCommandCount=0
-    VPNGathertime = 0
-    VPNcommandTime = 0
-    VPNavgTime=0
-    VPNGatherd=0
-    VPNcommands=0
-    VPNCommandCount=0
-    EIGRPavgTime = 0
-    GatherAverageTime = 0
-    CommandAverage=0
-    EIGRPcommands = 0
-    HSRPavgTime = 0
-    HSRPGatherTime = 0
-    HSRPaverageComandTime = 0
-    HSRPGatherd=0
-    HSRPCommands=0
-    HSRPCommandCount=0
-    ofCdpavgTime = 0
+    Host_Conf_Avg_Time = 0
+    Host_Config_command_count = 0
+    Ping_Avg_Time=0
+    CDP_AvgTime = 0
+    CDP_Average_Comand_Time = 0
+    CDP_Command_Count = 0
+    Edge_AVG_Time = 0
+    Edge_AVG_Gather_Time = 0
+    Edge_AVG_Command_Time = 0
+    Edge_Command_Count=0
+    VPN_AVG_Gather_Time = 0
+    VPN_AVG_Command_Time = 0
+    VPN_Avg_Time=0
+    VPN_Time_Gather_Count=0
+    VPN_Command_Time_Counter=0
+    VPN_Command_Count=0
+    EIGRP_Avg_Time = 0
+    EIGRP_AVG_Gather_Time = 0
+    EIGRP_AVG_Command_Time=0
+    EIGRP_Command_Count = 0
+    HSRP_AVG_Time = 0
+    HSRP_AVG_Gather_Time = 0
+    HSRP_Average_Comand_Time = 0
+    HSRP_Gather_Count=0
+    HSRP_Command_Time_counter=0
+    HSRP_Command_Count=0
+    ofCdp_AvgTime = 0
 
     
     nr = InitNornir(config_file="config.yaml") #this is the nornir object
@@ -110,8 +110,8 @@ def main():
 
 
         pbar = tqdm(total=1)
-        edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
-        test=edgeNodes.run(task=ConfigEdgeLeaf) #this is the vpn mesh function
+        Edge_Nodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
+        test=Edge_Nodes.run(task=ConfigEdgeLeaf) #this is the vpn mesh function
 
         tot=0
         avgTime=0
@@ -132,124 +132,124 @@ def main():
         pbar.colour="yellow"
 
         pbar.set_description("pinging hosts")
-        PingCount = nr.run(task=ping)
-        for x in PingCount:
-            PingavgTime+=PingCount[x].result[1]
-            tot+=PingCount[x].result[0]
-        PingavgTime=PingavgTime/len(PingCount)
+        Ping_Node = nr.run(task=ping)
+        for x in Ping_Node:
+            Ping_Avg_Time+=Ping_Node[x].result[1]
+            tot+=Ping_Node[x].result[0]
+        Ping_Avg_Time=Ping_Avg_Time/len(Ping_Node)
         pbar.update()
 
 
         pbar.set_description("resetting host names")
-        HostCount = nr.run(task=resettHostName)
-        for x in HostCount:
-            HostAvghTime+=HostCount[x].result[1]
-            hostcommands+=HostCount[x].result[0]
-        tot+=hostcommands
-        HostAvghTime=HostAvghTime/len(HostCount)
-        hostPScommands=hostcommands/HostAvghTime
+        Host_Node = nr.run(task=resettHostName)
+        for x in Host_Node:
+            Host_Conf_Avg_Time+=Host_Node[x].result[1]
+            Host_Config_command_count+=Host_Node[x].result[0]
+        tot+=Host_Config_command_count
+        Host_Conf_Avg_Time=Host_Conf_Avg_Time/len(Host_Node)
+        Host_Commands_per_sec=Host_Config_command_count/Host_Conf_Avg_Time
         nr = InitNornir(config_file="config.yaml") #re initialize the nornir object due to changes in hostname breaking the rest of the program if not reinitialized
         pbar.update()
 
 
         pbar.set_description("turning on cdp")
-        CDPCount = nr.run(task=TurnOnCDP)
-        for x in CDPCount:
-            CDPavgTime+=CDPCount[x].result[1]
-            CDPcommands+=CDPCount[x].result[0]
-            CDPaverageComandTime+=CDPCount[x].result[2]
-        tot+=CDPcommands
-        CDPavgTime=CDPavgTime/len(CDPCount)
-        CDPaverageComandTime=CDPaverageComandTime/len(CDPCount)
-        CDPPScommands=CDPcommands/CDPaverageComandTime
+        CDP_Node = nr.run(task=TurnOnCDP)
+        for x in CDP_Node:
+            CDP_AvgTime+=CDP_Node[x].result[1]
+            CDP_Command_Count+=CDP_Node[x].result[0]
+            CDP_Average_Comand_Time+=CDP_Node[x].result[2]
+        tot+=CDP_Command_Count
+        CDP_AvgTime=CDP_AvgTime/len(CDP_Node)
+        CDP_Average_Comand_Time=CDP_Average_Comand_Time/len(CDP_Node)
+        CDP_Commands_Per_Sec=CDP_Command_Count/CDP_Average_Comand_Time
         pbar.update()
 
 
         pbar.set_description("configuring EIGRP underlay")
-        EIGRPcount = nr.run(task=MicroSegmenter,SegmentationIps="10.0",
+        EIGRP_Node = nr.run(task=MicroSegmenter,SegmentationIps="10.0",
             SpineHostName="spine", 
             LeafHostname="leaf", 
             IpDomainName="simon")
-        for x in EIGRPcount:
-            EIGRPavgTime+=EIGRPcount[x].result[1]
-            EIGRPcommands+=EIGRPcount[x].result[0]
-            Gathertime=EIGRPcount[x].result[2]
-            CommandAverage+=EIGRPcount[x].result[3]
-        tot+=EIGRPcommands
-        EIGRPavgTime=EIGRPavgTime/len(EIGRPcount)
-        GatherAverageTime=Gathertime/len(EIGRPcount)
-        CommandAverage=CommandAverage/len(EIGRPcount)
-        EIGRPPScommands=EIGRPcommands/CommandAverage
+        for x in EIGRP_Node:
+            EIGRP_Avg_Time+=EIGRP_Node[x].result[1]
+            EIGRP_Command_Count+=EIGRP_Node[x].result[0]
+            EIGRP_Average_Gather_Time=EIGRP_Node[x].result[2]
+            EIGRP_AVG_Command_Time+=EIGRP_Node[x].result[3]
+        tot+=EIGRP_Command_Count
+        EIGRP_Avg_Time=EIGRP_Avg_Time/len(EIGRP_Node)
+        EIGRP_AVG_Gather_Time=EIGRP_Average_Gather_Time/len(EIGRP_Node)
+        EIGRP_AVG_Command_Time=EIGRP_AVG_Command_Time/len(EIGRP_Node)
+        EIGRP_AVG_Commands_Per_Sec=EIGRP_Command_Count/EIGRP_AVG_Command_Time
         pbar.update()
 
         
         pbar.set_description("configging HSRP")
-        HSRPcount = nr.run(task=hsrpPair)
-        for x in HSRPcount:
-            HSRPavgTime+=HSRPcount[x].result[1]
-            HSRPCommandCount+=HSRPcount[x].result[0]
-            NodeHSRPTime=HSRPcount[x].result[2]
-            if NodeHSRPTime != 0:
-                HSRPGatherTime+=HSRPcount[x].result[2]
-                HSRPGatherd+=1
-            NodeHSRPTime=HSRPcount[x].result[3]
-            if NodeHSRPTime != 0:
-                HSRPaverageComandTime+=HSRPcount[x].result[3]
-                HSRPCommands+=1
-        tot+=HSRPCommandCount
-        HSRPavgTime=HSRPavgTime/len(HSRPcount)
-        HSRPGatherTime=HSRPGatherTime/HSRPGatherd
-        HSRPaverageComandTime=HSRPaverageComandTime/HSRPCommands
-        HSRPPScommands=HSRPCommandCount/HSRPaverageComandTime
+        HSRP_Node = nr.run(task=hsrpPair)
+        for x in HSRP_Node:
+            HSRP_AVG_Time+=HSRP_Node[x].result[1]
+            HSRP_Command_Count+=HSRP_Node[x].result[0]
+            Node_HSRP_Gather_Time=HSRP_Node[x].result[2]
+            if Node_HSRP_Gather_Time != 0:
+                HSRP_AVG_Gather_Time+=HSRP_Node[x].result[2]
+                HSRP_Gather_Count+=1
+            Node_HSRP_Command_Time=HSRP_Node[x].result[3]
+            if Node_HSRP_Command_Time != 0:
+                HSRP_Average_Comand_Time+=HSRP_Node[x].result[3]
+                HSRP_Command_Time_counter+=1
+        tot+=HSRP_Command_Count
+        HSRP_AVG_Time=HSRP_AVG_Time/len(HSRP_Node)
+        HSRP_AVG_Gather_Time=HSRP_AVG_Gather_Time/HSRP_Gather_Count
+        HSRP_Average_Comand_Time=HSRP_Average_Comand_Time/HSRP_Command_Time_counter
+        HSRPPScommands=HSRP_Command_Count/HSRP_Average_Comand_Time
         pbar.update()
 
 
         pbar.set_description("Setting up VPN Mesh")
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
-        VPNcpount = nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
-        for x in VPNcpount:
-            VPNCommandCount+=VPNcpount[x].result[0]
-            VPNavgTime+=VPNcpount[x].result[1]
-            NodeVPNTime=VPNcpount[x].result[2]
-            if NodeVPNTime != 0:
-                VPNGathertime+=VPNcpount[x].result[2]
-                VPNGatherd+=1
-            NodeVPNTime=VPNcpount[x].result[3]
-            if NodeVPNTime != 0:
-                VPNcommandTime+=VPNcpount[x].result[3]
-                VPNcommands+=1
-        tot+=VPNCommandCount
-        VPNavgTime=VPNavgTime/len(VPNcpount)
-        VPNGathertime=VPNGathertime/VPNGatherd
-        VPNcommandTime=VPNcommandTime/VPNcommands
-        VPNPScommands=VPNCommandCount/VPNcommandTime
+        VPN_Node = nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        for x in VPN_Node:
+            VPN_Command_Count+=VPN_Node[x].result[0]
+            VPN_Avg_Time+=VPN_Node[x].result[1]
+            Node_VPN_Gather_Time=VPN_Node[x].result[2]
+            if Node_VPN_Gather_Time != 0:
+                VPN_AVG_Gather_Time+=VPN_Node[x].result[2]
+                VPN_Time_Gather_Count+=1
+            Node_VPN_Command_Time=VPN_Node[x].result[3]
+            if Node_VPN_Command_Time != 0:
+                VPN_AVG_Command_Time+=VPN_Node[x].result[3]
+                VPN_Command_Time_Counter+=1
+        tot+=VPN_Command_Count
+        VPN_Avg_Time=VPN_Avg_Time/len(VPN_Node)
+        VPN_AVG_Gather_Time=VPN_AVG_Gather_Time/VPN_Time_Gather_Count
+        VPN_AVG_Command_Time=VPN_AVG_Command_Time/VPN_Command_Time_Counter
+        VPN_AVG_Commands_Per_Sec=VPN_Command_Count/VPN_AVG_Command_Time
         pbar.update()
 
 
         pbar.set_description("configuring edge leafs")
-        edgeNodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
-        Edgecount = edgeNodes.run(task=ConfigEdgeLeaf)
-        for x in Edgecount:
-            EdgeCommandCount+=Edgecount[x].result[0]
-            EdgeavgTime+=Edgecount[x].result[1]
-            EdgeGatherTime+=Edgecount[x].result[2]
-            EdgeCommandTime+=Edgecount[x].result[3]
-        tot+=EdgeCommandCount
-        EdgeavgTime=EdgeavgTime/len(Edgecount)
-        EdgeGatherTime=EdgeGatherTime/len(Edgecount)
-        EdgeCommandTime=EdgeCommandTime/len(Edgecount)
-        EdgePScommands=EdgeCommandCount/EdgeCommandTime
+        Edge_Nodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
+        Edge_Node = Edge_Nodes.run(task=ConfigEdgeLeaf)
+        for x in Edge_Node:
+            Edge_Command_Count+=Edge_Node[x].result[0]
+            Edge_AVG_Time+=Edge_Node[x].result[1]
+            Edge_AVG_Gather_Time+=Edge_Node[x].result[2]
+            Edge_AVG_Command_Time+=Edge_Node[x].result[3]
+        tot+=Edge_Command_Count
+        Edge_AVG_Time=Edge_AVG_Time/len(Edge_Node)
+        Edge_AVG_Gather_Time=Edge_AVG_Gather_Time/len(Edge_Node)
+        Edge_AVG_Command_Time=Edge_AVG_Command_Time/len(Edge_Node)
+        Edge_AVG_Commands_Per_Sec=Edge_Command_Count/Edge_AVG_Command_Time
         pbar.update()
 
 
         pbar.set_description("turning off cdp")
         nr.run(task=TurnOfCDP) #turn on CDP
-        ofCdpcount = nr.run(task=TurnOfCDP)
-        for x in ofCdpcount:
-            tot+=ofCdpcount[x].result[0]
-            ofCdpavgTime+=ofCdpcount[x].result[1]
-        ofCdpavgTime=ofCdpavgTime/len(ofCdpcount)
+        ofCdp_Node = nr.run(task=TurnOfCDP)
+        for x in ofCdp_Node:
+            tot+=ofCdp_Node[x].result[0]
+            ofCdp_AvgTime+=ofCdp_Node[x].result[1]
+        ofCdp_AvgTime=ofCdp_AvgTime/len(ofCdp_Node)
         pbar.update()
 
 
@@ -267,15 +267,15 @@ def main():
     #nr.run(task=netmiko_send_command, command_string="reload", enable=True, use_timing=True)
     #nr.run(task=netmiko_send_command, command_string="y", enable=True, use_timing=True, ignore_errors=True)
 
-    print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {PingavgTime}")
-    print(f"time spent configuring host information: {HostAvghTime}, sending a total command count of {hostcommands}, command PS count {hostPScommands}")
-    print(f"time spent configuring EIGRP: {EIGRPavgTime}, sending a total command count of {EIGRPcommands}, command PS count {EIGRPPScommands} using a average of {GatherAverageTime} on gathering information")
-    print(f"time spent configuring CDP: {CDPavgTime}, sending a total command count of {CDPcommands}, command PS count {CDPPScommands}")
-    print(f"time spent configuring HSRP: {HSRPavgTime}, sending a total command count of {HSRPCommandCount}, command PS count {HSRPPScommands}")
-    print(f"time spent configuring VPN Mesh: {VPNavgTime}, sending a total command count of {VPNCommandCount}, command PS count {VPNPScommands}")
-    print(f"time spent configuring edge leafs: {EdgeavgTime}, sending a total command count of {EdgeCommandCount}, command PS count {EdgePScommands}")
-    print(f"time spent turning off cdp: {ofCdpavgTime}")
-    print(f"total command PS: {(hostPScommands+EIGRPPScommands+CDPPScommands+HSRPPScommands+VPNPScommands+EdgePScommands)/6}")
+    print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {Ping_Avg_Time}")
+    print(f"time spent configuring host information: {Host_Conf_Avg_Time}, sending a total command count of {Host_Config_command_count}, command PS count {Host_Commands_per_sec}")
+    print(f"time spent configuring EIGRP: {EIGRP_Avg_Time}, sending a total command count of {EIGRP_Command_Count}, command PS count {EIGRP_AVG_Commands_Per_Sec} using a average of {EIGRP_AVG_Gather_Time} on gathering information")
+    print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
+    print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
+    print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
+    print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
+    print(f"time spent turning off cdp: {ofCdp_AvgTime}")
+    print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6}")
     print(f"total commands sent: {tot}")
 
 
