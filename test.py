@@ -18,12 +18,11 @@ from tqdm import tqdm
 import time
 
 #todo:
-#!FIX WHATEVER THE FUCK IS WRONG WITH THE VPN MESH THAT MAKES IT NON EKSTENSIBLE! 
-#///!FIX  HSRP AND LEAF VLAN 1 SCRIPT!!! this was a configg error in host file
 #!MAKE THE SCRIPT ABLE TO RUNN WITHOUT THE NEED OF EDGE SWITCHES!
-#!RESETTER
 #progressbar for DHCP
 #nicify the outputt by rounding the numbers
+#figgure out the progress bars and axualy READ about how to use them
+#more descriptive progress bars (WHAT ARE YOU DONE CONFIGGURING, NAD WHAT ARE YOU CONFIGGURING)
 #!improove the resetter to reset the standby and logic groups
 #find out a nice way to display constructive outputt while the script is running
 #look at ways to redo the storage of the fetch to prevent the script from gathering the same data many times 
@@ -37,6 +36,7 @@ import time
 #L2TP VPN
 #redo the storage of the running config and interface config in adition to the cdp
 #maby store it in the nornir object
+#present speed data, commands writte, hosts configgured, time per node, total time, commansd per node, commands total, commands per seccond per node, commands per second total
 #optional: tftp ssh config deployment using option 82 (optional)
 #optional: mac adress reserve ip adress based
 #optional: client side almoaste equal settup, only difrence is in host. yaml file
@@ -118,32 +118,8 @@ def main():
         pbar.update()
 
     elif testNew: #if you want to test the new code, set this to true
-
-        pbar = tqdm(total=1)
-        leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
-        spines = len(nr.inventory.children_of_group("spine"))
-        VPN_Node = nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
-        for x in VPN_Node:
-            VPN_Command_Count+=VPN_Node[x].result[0]
-            VPN_Avg_Time+=VPN_Node[x].result[1]
-            Node_VPN_Gather_Time=VPN_Node[x].result[2]
-            if Node_VPN_Gather_Time != 0:
-                VPN_AVG_Gather_Time+=VPN_Node[x].result[2]
-                VPN_Time_Gather_Count+=1
-            Node_VPN_Command_Time=VPN_Node[x].result[3]
-            if Node_VPN_Command_Time != 0:
-                VPN_AVG_Command_Time+=VPN_Node[x].result[3]
-                VPN_Command_Time_Counter+=1
-        tot+=VPN_Command_Count
-        VPN_Avg_Time=VPN_Avg_Time/len(VPN_Node)
-        VPN_AVG_Gather_Time=VPN_AVG_Gather_Time/VPN_Time_Gather_Count
-        VPN_AVG_Command_Time=VPN_AVG_Command_Time/VPN_Command_Time_Counter
-        VPN_AVG_Commands_Per_Sec=VPN_Command_Count/VPN_AVG_Command_Time
-
-        print(VPN_Node["leaf1.cmh"].result[5])
-        for y in VPN_Node["leaf1.cmh"].result[4]:
-            print(y)
-        pbar.update()
+        pbar = tqdm(total=7)
+        print(len(nr.inventory.hosts))
 
     else: #runns the settup
         pbar = tqdm(total=10)
@@ -292,8 +268,8 @@ def main():
         pbar.update()
 
 
-    pbar.set_description("saving running config to start config")
-    nr.run(task=SaveRunningToStart)
+    #pbar.set_description("saving running config to start config")
+    #nr.run(task=SaveRunningToStart)
 
 
     pbar.colour="green"
@@ -315,7 +291,8 @@ def main():
         #print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
         print(f"time spent configuring DHCP: {DHCP_AVG_Time}, sending a total command count of {DHCP_Command_Count}, command PS count {DHCP_AVG_Commands_Per_Sec}")
         print(f"time spent turning off cdp: {ofCdp_AvgTime}")
-        print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec)/6}") #!add Edge_AVG_Commands_Per_Sec
+        totAVGComPS = (Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec)/6
+        print(f"total command PS: {totAVGComPS} PER THREAD/NODE wich is a total of{totAVGComPS*len(nr.inventory.hosts)}") #!add Edge_AVG_Commands_Per_Sec
         print(f"total commands sent: {tot}")
     except:
         print("error")

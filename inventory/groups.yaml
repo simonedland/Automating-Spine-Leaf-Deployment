@@ -43,19 +43,6 @@ router:
           secret: Password
           fast_cli: False
           conn_timeout: 10000
-minGroup:
-  connection_options:
-    netmiko:
-      extras:
-        fast_cli: False
-        conn_timeout: 10000
-        secret: Password
-    napalm:
-      extras:
-        optional_args:
-          secret: Password
-          fast_cli: False
-          conn_timeout: 10000
 edge:
   connection_options:
     netmiko:
