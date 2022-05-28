@@ -52,18 +52,18 @@ leaf6.cmh:
         - edge
     data:
         switchpair: 3
-#leaf7.cmh:
-#    hostname: 10.100.0.12
-#    groups:
-#        - leaf
-#    data:
-#        switchpair: 4
-#leaf8.cmh:
-#    hostname: 10.100.0.13
-#    groups:
-#        - leaf
-#    data:
-#        switchpair: 5
+leaf7.cmh:
+    hostname: 10.100.0.12
+    groups:
+        - leaf
+    data:
+        switchpair: 4
+leaf8.cmh:
+    hostname: 10.100.0.13
+    groups:
+        - leaf
+    data:
+        switchpair: 5
 #leaf9.cmh:
 #    hostname: 10.100.0.14
 #    groups:

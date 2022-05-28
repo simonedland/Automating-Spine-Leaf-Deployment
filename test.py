@@ -19,6 +19,7 @@ import time
 
 #todo:
 #!FIX WHATEVER THE FUCK IS WRONG WITH THE VPN MESH THAT MAKES IT NON EKSTENSIBLE!
+#!FIX  HSRP AND LEAF VLAN 1 SCRIPT!!!
 #!MAKE THE SCRIPT ABLE TO RUNN WITHOUT THE NEED OF EDGE SWITCHES!
 #!RESETTER
 #progressbar for DHCP
@@ -120,27 +121,52 @@ def main():
 
 
 
-        pbar = tqdm(total=1)
-        DHCP_Nodes = nr.filter(F(groups__contains="leaf")) #this is the nornir object with only the edge nodes
-        Pairs = int(len(nr.inventory.children_of_group("leaf"))/2) #this is the number of leafs
-        DHCP_Pools = (subbnetter(nettwork=f"192.168.2.0",nettworkReq=[{"numberOfSubbnets":Pairs, "requiredHosts":255},]))
-        DHCP_Node = DHCP_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
-        
 
+
+
+
+        pbar = tqdm(total=1)
+        leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
+        spines = len(nr.inventory.children_of_group("spine"))
+        VPN_Node = nr.run(task=vpnMaker, NrOfLeafs=leafs, NrOfSpines=spines) #this is the vpn mesh function
+        for x in VPN_Node:
+            VPN_Command_Count+=VPN_Node[x].result[0]
+            VPN_Avg_Time+=VPN_Node[x].result[1]
+            Node_VPN_Gather_Time=VPN_Node[x].result[2]
+            if Node_VPN_Gather_Time != 0:
+                VPN_AVG_Gather_Time+=VPN_Node[x].result[2]
+                VPN_Time_Gather_Count+=1
+            Node_VPN_Command_Time=VPN_Node[x].result[3]
+            if Node_VPN_Command_Time != 0:
+                VPN_AVG_Command_Time+=VPN_Node[x].result[3]
+                VPN_Command_Time_Counter+=1
+        tot+=VPN_Command_Count
+        VPN_Avg_Time=VPN_Avg_Time/len(VPN_Node)
+        VPN_AVG_Gather_Time=VPN_AVG_Gather_Time/VPN_Time_Gather_Count
+        VPN_AVG_Command_Time=VPN_AVG_Command_Time/VPN_Command_Time_Counter
+        VPN_AVG_Commands_Per_Sec=VPN_Command_Count/VPN_AVG_Command_Time
+
+        print(VPN_Node["leaf1.cmh"].result[5])
+        for y in VPN_Node["leaf1.cmh"].result[4]:
+            print(y)
         pbar.update()
+
+
+
+
 
 
     else: #runns the settup
         pbar = tqdm(total=10)
         pbar.colour="yellow"
 
-        pbar.set_description("pinging hosts")
-        Ping_Node = nr.run(task=ping)
-        for x in Ping_Node:
-            Ping_Avg_Time+=Ping_Node[x].result[1]
-            tot+=Ping_Node[x].result[0]
-        Ping_Avg_Time=Ping_Avg_Time/len(Ping_Node)
-        pbar.update()
+        #pbar.set_description("pinging hosts")
+        #Ping_Node = nr.run(task=ping)
+        #for x in Ping_Node:
+        #    Ping_Avg_Time+=Ping_Node[x].result[1]
+        #    tot+=Ping_Node[x].result[0]
+        #Ping_Avg_Time=Ping_Avg_Time/len(Ping_Node)
+        #pbar.update()
 
 
         pbar.set_description("resetting host names")
@@ -228,49 +254,53 @@ def main():
         VPN_AVG_Command_Time=VPN_AVG_Command_Time/VPN_Command_Time_Counter
         VPN_AVG_Commands_Per_Sec=VPN_Command_Count/VPN_AVG_Command_Time
         pbar.update()
-
-
-        pbar.set_description("configuring edge leafs")
-        Edge_Nodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
-        Edge_Node = Edge_Nodes.run(task=ConfigEdgeLeaf)
-        for x in Edge_Node:
-            Edge_Command_Count+=Edge_Node[x].result[0]
-            Edge_AVG_Time+=Edge_Node[x].result[1]
-            Edge_AVG_Gather_Time+=Edge_Node[x].result[2]
-            Edge_AVG_Command_Time+=Edge_Node[x].result[3]
-        tot+=Edge_Command_Count
-        Edge_AVG_Time=Edge_AVG_Time/len(Edge_Node)
-        Edge_AVG_Gather_Time=Edge_AVG_Gather_Time/len(Edge_Node)
-        Edge_AVG_Command_Time=Edge_AVG_Command_Time/len(Edge_Node)
-        Edge_AVG_Commands_Per_Sec=Edge_Command_Count/Edge_AVG_Command_Time
+        
+        for y in VPN_Node["leaf1.cmh"].result[4]:
+            print(y)
         pbar.update()
 
 
-        pbar.set_description("configuring DHCP Servers")
-        DHCP_Nodes = nr.filter(F(groups__contains="leaf")) #this is the nornir object with only the edge nodes
-        Pairs = int(len(nr.inventory.children_of_group("leaf"))/2) #this is the number of leafs
-        DHCP_Pools = (subbnetter(nettwork=f"192.168.2.0",nettworkReq=[{"numberOfSubbnets":Pairs, "requiredHosts":255},]))
-        DHCP_Node = DHCP_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
-        for x in DHCP_Node:
-            DHCP_Command_Count+=DHCP_Node[x].result[0]
-            DHCP_AVG_Time+=DHCP_Node[x].result[1]
-            DHCP_AVG_Gather_Time+=DHCP_Node[x].result[2]
-            DHCP_AVG_Command_Time+=DHCP_Node[x].result[3]
-        tot+=DHCP_Command_Count
-        DHCP_AVG_Time=DHCP_AVG_Time/len(DHCP_Node)
-        DHCP_AVG_Gather_Time=DHCP_AVG_Gather_Time/len(DHCP_Node)
-        DHCP_AVG_Command_Time=DHCP_AVG_Command_Time/len(DHCP_Node)
-        DHCP_AVG_Commands_Per_Sec=DHCP_Command_Count/DHCP_AVG_Command_Time
-        pbar.update()
+        #pbar.set_description("configuring edge leafs")
+        #Edge_Nodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
+        #Edge_Node = Edge_Nodes.run(task=ConfigEdgeLeaf)
+        #for x in Edge_Node:
+        #    Edge_Command_Count+=Edge_Node[x].result[0]
+        #    Edge_AVG_Time+=Edge_Node[x].result[1]
+        #    Edge_AVG_Gather_Time+=Edge_Node[x].result[2]
+        #    Edge_AVG_Command_Time+=Edge_Node[x].result[3]
+        #tot+=Edge_Command_Count
+        #Edge_AVG_Time=Edge_AVG_Time/len(Edge_Node)
+        #Edge_AVG_Gather_Time=Edge_AVG_Gather_Time/len(Edge_Node)
+        #Edge_AVG_Command_Time=Edge_AVG_Command_Time/len(Edge_Node)
+        #Edge_AVG_Commands_Per_Sec=Edge_Command_Count/Edge_AVG_Command_Time
+        #pbar.update()
 
-        pbar.set_description("turning off cdp")
-        nr.run(task=TurnOfCDP) #turn on CDP
-        ofCdp_Node = nr.run(task=TurnOfCDP)
-        for x in ofCdp_Node:
-            tot+=ofCdp_Node[x].result[0]
-            ofCdp_AvgTime+=ofCdp_Node[x].result[1]
-        ofCdp_AvgTime=ofCdp_AvgTime/len(ofCdp_Node)
-        pbar.update()
+
+        #pbar.set_description("configuring DHCP Servers")
+        #DHCP_Nodes = nr.filter(F(groups__contains="leaf")) #this is the nornir object with only the edge nodes
+        #Pairs = int(len(nr.inventory.children_of_group("leaf"))/2) #this is the number of leafs
+        #DHCP_Pools = (subbnetter(nettwork=f"192.168.2.0",nettworkReq=[{"numberOfSubbnets":Pairs, "requiredHosts":255},]))
+        #DHCP_Node = DHCP_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
+        #for x in DHCP_Node:
+        #    DHCP_Command_Count+=DHCP_Node[x].result[0]
+        #    DHCP_AVG_Time+=DHCP_Node[x].result[1]
+        #    DHCP_AVG_Gather_Time+=DHCP_Node[x].result[2]
+        #    DHCP_AVG_Command_Time+=DHCP_Node[x].result[3]
+        #tot+=DHCP_Command_Count
+        #DHCP_AVG_Time=DHCP_AVG_Time/len(DHCP_Node)
+        #DHCP_AVG_Gather_Time=DHCP_AVG_Gather_Time/len(DHCP_Node)
+        #DHCP_AVG_Command_Time=DHCP_AVG_Command_Time/len(DHCP_Node)
+        #DHCP_AVG_Commands_Per_Sec=DHCP_Command_Count/DHCP_AVG_Command_Time
+        #pbar.update()
+#
+        #pbar.set_description("turning off cdp")
+        #nr.run(task=TurnOfCDP) #turn on CDP
+        #ofCdp_Node = nr.run(task=TurnOfCDP)
+        #for x in ofCdp_Node:
+        #    tot+=ofCdp_Node[x].result[0]
+        #    ofCdp_AvgTime+=ofCdp_Node[x].result[1]
+        #ofCdp_AvgTime=ofCdp_AvgTime/len(ofCdp_Node)
+        #pbar.update()
 
 
     #pbar.set_description("saving running config to start config")
@@ -286,18 +316,20 @@ def main():
     #print("rebooting")
     #nr.run(task=netmiko_send_command, command_string="reload", enable=True, use_timing=True)
     #nr.run(task=netmiko_send_command, command_string="y", enable=True, use_timing=True, ignore_errors=True)
-
-    print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {Ping_Avg_Time}")
-    print(f"time spent configuring host information: {Host_Conf_Avg_Time}, sending a total command count of {Host_Config_command_count}, command PS count {Host_Commands_per_sec}")
-    print(f"time spent configuring EIGRP: {EIGRP_Avg_Time}, sending a total command count of {EIGRP_Command_Count}, command PS count {EIGRP_AVG_Commands_Per_Sec} using a average of {EIGRP_AVG_Gather_Time} on gathering information")
-    print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
-    print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
-    print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
-    print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
-    print(f"time spent configuring DHCP: {DHCP_AVG_Time}, sending a total command count of {DHCP_Command_Count}, command PS count {DHCP_AVG_Commands_Per_Sec}")
-    print(f"time spent turning off cdp: {ofCdp_AvgTime}")
-    print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6}")
-    print(f"total commands sent: {tot}")
+    try:
+        print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {Ping_Avg_Time}")
+        print(f"time spent configuring host information: {Host_Conf_Avg_Time}, sending a total command count of {Host_Config_command_count}, command PS count {Host_Commands_per_sec}")
+        print(f"time spent configuring EIGRP: {EIGRP_Avg_Time}, sending a total command count of {EIGRP_Command_Count}, command PS count {EIGRP_AVG_Commands_Per_Sec} using a average of {EIGRP_AVG_Gather_Time} on gathering information")
+        print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
+        print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
+        print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
+        print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
+        print(f"time spent configuring DHCP: {DHCP_AVG_Time}, sending a total command count of {DHCP_Command_Count}, command PS count {DHCP_AVG_Commands_Per_Sec}")
+        print(f"time spent turning off cdp: {ofCdp_AvgTime}")
+        print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6}")
+        print(f"total commands sent: {tot}")
+    except:
+        print("error")
 
 
 
