@@ -18,6 +18,9 @@ from tqdm import tqdm
 import time
 
 #todo:
+#!FIX WHATEVER THE FUCK IS WRONG WITH THE VPN MESH THAT MAKES IT NON EKSTENSIBLE!
+#!MAKE THE SCRIPT ABLE TO RUNN WITHOUT THE NEED OF EDGE SWITCHES!
+#!RESETTER
 #progressbar for DHCP
 #nicify the outputt by rounding the numbers
 #!improove the resetter to reset the standby and logic groups

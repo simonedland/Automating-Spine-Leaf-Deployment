@@ -46,6 +46,9 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
                             NewIpList[Dim1][Dim2].append(NewIpList[Dim3][Dim2][Dim1].split('.')[0]+"."+str(int(NewIpList[Dim3][Dim2][Dim1].split('.')[1])+1)) #adds 1 to the last ip of the list choosinga higher ip in the microsegment
 
 
+    for i in NewIpList:
+        print(i)
+        
     subbnetList=[]
     for x in range(0,9): #makes 10 subbnets
         subbnetList.append(subbnetter(nettwork=f"10.0.{x}.0",nettworkReq=[{"numberOfSubbnets":64, "requiredHosts":2},])) #makes 64 subbnets with 2 hosts each

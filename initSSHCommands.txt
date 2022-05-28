@@ -1,12 +1,13 @@
 en
 conf t
-hostname router2
+hostname leaf10
 enable secret Password
 username Username secret Password
 ip domain-name simon
 ip routing
 int g0/3
-ip address 10.100.0.11 255.255.255.0
+no switch
+ip address 10.100.0.115 255.255.255.0
 description ssh
 exit
 crypto key generate rsa
@@ -16,6 +17,7 @@ line vt 0 15
 login local
 transport input ssh
 exit
+ip route 192.168.1.51 255.255.255.255 10.100.0.100
 do cop run start
 
 ##############################################################################################
