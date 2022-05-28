@@ -49,7 +49,7 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=True #this is the option to bring down the network
+    bringDown=False #this is the option to bring down the network
     testNew=False #if you want to test the new code, set this to true
 
 

@@ -37,7 +37,8 @@ def resetter(node): #main function of this script
     interfacesNapalm = node.run(task=napalm_get, getters=["interfaces"]).result #this is the napalm interface information
 
 
-    #COPPY PASTE FROM DHCP POOL GENERATOR
+    #?COPPY PASTE FROM DHCP POOL GENERATOR
+
     node.host["cdp"] = node.run(task=netmiko_send_command, command_string=("sh cdp nei de")).result #this is the interface information
     node.host["run"] = node.run(task=netmiko_send_command, command_string=("sh run"), enable=True).result #this is the running config
     hostnames = [i for i in range(len(node.host["cdp"])) if node.host["cdp"].startswith("Device ID:", i)] #finds the location of the device id
@@ -48,9 +49,13 @@ def resetter(node): #main function of this script
         interface = (node.host["cdp"][interfaces[x]+11:interfaces[x]+30].split("\n")[0].split(".")[0].split(",")[0]) #this is the interface that the neigbour is connected to
         if hostname != "Switch": #this is to make sure that the hostname is not just a switch
             cdpNeigbourDirections.append({"name":hostname, "interface":interface})
-    switchpair=node.host['switchpair']-1
-    locationOfQuote=node.host["run"].find(f"hostname leaf")
-    LeafNr=int(node.host["run"][locationOfQuote+13:locationOfQuote+15].replace(" ","").replace("\n",""))
+    try:
+        switchpair=node.host['switchpair']-1
+        locationOfQuote=node.host["run"].find(f"hostname leaf")
+        LeafNr=int(node.host["run"][locationOfQuote+13:locationOfQuote+15].replace(" ","").replace("\n",""))
+    except:
+        switchpair=0
+        LeafNr=0
 
     for x in cdpNeigbourDirections: #for every neigbour in the cdp neigbour list
         if "leaf" in x["name"]: #if the neigbour is a leaf
@@ -70,7 +75,8 @@ def resetter(node): #main function of this script
     else:
         excludLow=f"{str(DHCP_Pools[switchpair]['subbnetID']).split('.')[0]}.{str(DHCP_Pools[switchpair]['subbnetID']).split('.')[1]}.{str(DHCP_Pools[switchpair]['subbnetID']).split('.')[2]}.10"
         excludHigh=f"{str(DHCP_Pools[switchpair]['subbnetID']).split('.')[0]}.{str(DHCP_Pools[switchpair]['subbnetID']).split('.')[1]}.{str(DHCP_Pools[switchpair]['subbnetID']).split('.')[2]}.127"
-    #END OF COPPYPASTE
+    
+    #?END OF COPPYPASTE
 
 
     pbar.colour="green"
