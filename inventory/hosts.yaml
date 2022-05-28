@@ -3,7 +3,6 @@ spine1.cmh:
     hostname: 10.100.0.1
     groups:
         - spine
-        - minGroup
 spine2.cmh:
     hostname: 10.100.0.2
     groups:
@@ -16,14 +15,12 @@ leaf1.cmh:
     hostname: 10.100.0.4
     groups:
         - leaf
-        - minGroup
     data:
         switchpair: 1
 leaf2.cmh:
     hostname: 10.100.0.5
     groups:
         - leaf
-        - minGroup
     data:
         switchpair: 1
 leaf3.cmh:
@@ -63,20 +60,20 @@ leaf8.cmh:
     groups:
         - leaf
     data:
+        switchpair: 4
+leaf9.cmh:
+    hostname: 10.100.0.14
+    groups:
+        - leaf
+    data:
         switchpair: 5
-#leaf9.cmh:
-#    hostname: 10.100.0.14
-#    groups:
-#        - leaf
-#    data:
-#        switchpair: 5
-#leaf10.cmh:
-#    hostname: 10.100.0.15
-#    groups:
-#        - leaf
-#    data:
-#        switchpair: 4
-#
+leaf10.cmh:
+    hostname: 10.100.0.15
+    groups:
+        - leaf
+    data:
+        switchpair: 5
+
 router1.cmh:
     hostname: 10.100.0.10
     groups:

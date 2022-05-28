@@ -19,7 +19,7 @@ import time
 
 #todo:
 #!FIX WHATEVER THE FUCK IS WRONG WITH THE VPN MESH THAT MAKES IT NON EKSTENSIBLE!
-#!FIX  HSRP AND LEAF VLAN 1 SCRIPT!!!
+#///!FIX  HSRP AND LEAF VLAN 1 SCRIPT!!! this was a configg error in host file
 #!MAKE THE SCRIPT ABLE TO RUNN WITHOUT THE NEED OF EDGE SWITCHES!
 #!RESETTER
 #progressbar for DHCP
@@ -160,13 +160,13 @@ def main():
         pbar = tqdm(total=10)
         pbar.colour="yellow"
 
-        #pbar.set_description("pinging hosts")
-        #Ping_Node = nr.run(task=ping)
-        #for x in Ping_Node:
-        #    Ping_Avg_Time+=Ping_Node[x].result[1]
-        #    tot+=Ping_Node[x].result[0]
-        #Ping_Avg_Time=Ping_Avg_Time/len(Ping_Node)
-        #pbar.update()
+        pbar.set_description("pinging hosts")
+        Ping_Node = nr.run(task=ping)
+        for x in Ping_Node:
+            Ping_Avg_Time+=Ping_Node[x].result[1]
+            tot+=Ping_Node[x].result[0]
+        Ping_Avg_Time=Ping_Avg_Time/len(Ping_Node)
+        pbar.update()
 
 
         pbar.set_description("resetting host names")
@@ -276,31 +276,31 @@ def main():
         #pbar.update()
 
 
-        #pbar.set_description("configuring DHCP Servers")
-        #DHCP_Nodes = nr.filter(F(groups__contains="leaf")) #this is the nornir object with only the edge nodes
-        #Pairs = int(len(nr.inventory.children_of_group("leaf"))/2) #this is the number of leafs
-        #DHCP_Pools = (subbnetter(nettwork=f"192.168.2.0",nettworkReq=[{"numberOfSubbnets":Pairs, "requiredHosts":255},]))
-        #DHCP_Node = DHCP_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
-        #for x in DHCP_Node:
-        #    DHCP_Command_Count+=DHCP_Node[x].result[0]
-        #    DHCP_AVG_Time+=DHCP_Node[x].result[1]
-        #    DHCP_AVG_Gather_Time+=DHCP_Node[x].result[2]
-        #    DHCP_AVG_Command_Time+=DHCP_Node[x].result[3]
-        #tot+=DHCP_Command_Count
-        #DHCP_AVG_Time=DHCP_AVG_Time/len(DHCP_Node)
-        #DHCP_AVG_Gather_Time=DHCP_AVG_Gather_Time/len(DHCP_Node)
-        #DHCP_AVG_Command_Time=DHCP_AVG_Command_Time/len(DHCP_Node)
-        #DHCP_AVG_Commands_Per_Sec=DHCP_Command_Count/DHCP_AVG_Command_Time
-        #pbar.update()
+        pbar.set_description("configuring DHCP Servers")
+        DHCP_Nodes = nr.filter(F(groups__contains="leaf")) #this is the nornir object with only the edge nodes
+        Pairs = int(len(nr.inventory.children_of_group("leaf"))/2) #this is the number of leafs
+        DHCP_Pools = (subbnetter(nettwork=f"192.168.2.0",nettworkReq=[{"numberOfSubbnets":Pairs, "requiredHosts":255},]))
+        DHCP_Node = DHCP_Nodes.run(task=AddDHCPPools, ipconfigs=DHCP_Pools)
+        for x in DHCP_Node:
+            DHCP_Command_Count+=DHCP_Node[x].result[0]
+            DHCP_AVG_Time+=DHCP_Node[x].result[1]
+            DHCP_AVG_Gather_Time+=DHCP_Node[x].result[2]
+            DHCP_AVG_Command_Time+=DHCP_Node[x].result[3]
+        tot+=DHCP_Command_Count
+        DHCP_AVG_Time=DHCP_AVG_Time/len(DHCP_Node)
+        DHCP_AVG_Gather_Time=DHCP_AVG_Gather_Time/len(DHCP_Node)
+        DHCP_AVG_Command_Time=DHCP_AVG_Command_Time/len(DHCP_Node)
+        DHCP_AVG_Commands_Per_Sec=DHCP_Command_Count/DHCP_AVG_Command_Time
+        pbar.update()
 #
-        #pbar.set_description("turning off cdp")
-        #nr.run(task=TurnOfCDP) #turn on CDP
-        #ofCdp_Node = nr.run(task=TurnOfCDP)
-        #for x in ofCdp_Node:
-        #    tot+=ofCdp_Node[x].result[0]
-        #    ofCdp_AvgTime+=ofCdp_Node[x].result[1]
-        #ofCdp_AvgTime=ofCdp_AvgTime/len(ofCdp_Node)
-        #pbar.update()
+        pbar.set_description("turning off cdp")
+        nr.run(task=TurnOfCDP) #turn on CDP
+        ofCdp_Node = nr.run(task=TurnOfCDP)
+        for x in ofCdp_Node:
+            tot+=ofCdp_Node[x].result[0]
+            ofCdp_AvgTime+=ofCdp_Node[x].result[1]
+        ofCdp_AvgTime=ofCdp_AvgTime/len(ofCdp_Node)
+        pbar.update()
 
 
     #pbar.set_description("saving running config to start config")
