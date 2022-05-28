@@ -18,7 +18,7 @@ from tqdm import tqdm
 import time
 
 #todo:
-#!FIX WHATEVER THE FUCK IS WRONG WITH THE VPN MESH THAT MAKES IT NON EKSTENSIBLE!
+#!FIX WHATEVER THE FUCK IS WRONG WITH THE VPN MESH THAT MAKES IT NON EKSTENSIBLE! 
 #///!FIX  HSRP AND LEAF VLAN 1 SCRIPT!!! this was a configg error in host file
 #!MAKE THE SCRIPT ABLE TO RUNN WITHOUT THE NEED OF EDGE SWITCHES!
 #!RESETTER
@@ -49,7 +49,7 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=False #this is the option to bring down the network
+    bringDown=True #this is the option to bring down the network
     testNew=False #if you want to test the new code, set this to true
 
 
@@ -119,12 +119,6 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
 
-
-
-
-
-
-
         pbar = tqdm(total=1)
         leafs = len(nr.inventory.children_of_group("leaf")) #this is the number of leafs in the network
         spines = len(nr.inventory.children_of_group("spine"))
@@ -150,11 +144,6 @@ def main():
         for y in VPN_Node["leaf1.cmh"].result[4]:
             print(y)
         pbar.update()
-
-
-
-
-
 
     else: #runns the settup
         pbar = tqdm(total=10)
@@ -303,8 +292,8 @@ def main():
         pbar.update()
 
 
-    #pbar.set_description("saving running config to start config")
-    #nr.run(task=SaveRunningToStart)
+    pbar.set_description("saving running config to start config")
+    nr.run(task=SaveRunningToStart)
 
 
     pbar.colour="green"
@@ -323,10 +312,10 @@ def main():
         print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
         print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
         print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
-        print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
+        #print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
         print(f"time spent configuring DHCP: {DHCP_AVG_Time}, sending a total command count of {DHCP_Command_Count}, command PS count {DHCP_AVG_Commands_Per_Sec}")
         print(f"time spent turning off cdp: {ofCdp_AvgTime}")
-        print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6}")
+        print(f"total command PS: {(Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec)/6}") #!add Edge_AVG_Commands_Per_Sec
         print(f"total commands sent: {tot}")
     except:
         print("error")
