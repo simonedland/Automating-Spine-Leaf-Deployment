@@ -11,7 +11,7 @@ def vpnMaker(node, NrOfLeafs, NrOfSpines):
     pbar.colour = "yellow"
 
     tunnelLan=[]
-    for x in range(0,NrOfLeafs): #not very modular and not very efficient in adition not very elegant either
+    for x in range(0,NrOfSpines): #not very modular and not very efficient in adition not very elegant either
         tunnelLan.append(subbnetter(nettwork=f"10.3.{x}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
 
     #!WARNING THIS IS TRASH CODE BUT IT WORKS

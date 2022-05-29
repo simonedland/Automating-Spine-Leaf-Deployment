@@ -20,7 +20,6 @@ from decimal import Decimal
 
 #todo:
 #progressbar for DHCP
-#nicify the outputt by rounding the numbers
 #figgure out the progress bars and axualy READ about how to use them
 #more descriptive progress bars (WHAT ARE YOU DONE CONFIGGURING, NAD WHAT ARE YOU CONFIGGURING)
 #!improove the resetter to reset the standby and logic groups
@@ -45,11 +44,12 @@ from decimal import Decimal
 
 
 
-startTime=time.time() #this is the start time of the program
 
-def main():
 
-    bringDown=False #this is the option to bring down the network
+def main(bringDown=False):
+    startTime=time.time() #this is the start time of the program
+
+    #bringDown=True #this is the option to bring down the network
     testNew=False #if you want to test the new code, set this to true
 
 
@@ -308,8 +308,10 @@ def main():
         print("error")
 
 
+    print(f"the script took {round(time.time()-startTime, 2)} seconds") #prints how long the script took to run
 
+main(True)
 main() #run the main function
 
 
-print(f"the script took {round(time.time()-startTime, 2)} seconds") #prints how long the script took to run
+
