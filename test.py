@@ -18,7 +18,6 @@ from tqdm import tqdm
 import time
 
 #todo:
-#!MAKE THE SCRIPT ABLE TO RUNN WITHOUT THE NEED OF EDGE SWITCHES!
 #progressbar for DHCP
 #nicify the outputt by rounding the numbers
 #figgure out the progress bars and axualy READ about how to use them
@@ -49,7 +48,7 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=False #this is the option to bring down the network
+    bringDown=True #this is the option to bring down the network
     testNew=False #if you want to test the new code, set this to true
 
 
@@ -119,7 +118,7 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
         pbar = tqdm(total=7)
-        print(len(nr.inventory.hosts))
+        print(len(nr.inventory.children_of_group("edge")))
 
     else: #runns the settup
         pbar = tqdm(total=10)
@@ -225,20 +224,24 @@ def main():
         pbar.update()
 
 
-        #pbar.set_description("configuring edge leafs")
-        #Edge_Nodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
-        #Edge_Node = Edge_Nodes.run(task=ConfigEdgeLeaf)
-        #for x in Edge_Node:
-        #    Edge_Command_Count+=Edge_Node[x].result[0]
-        #    Edge_AVG_Time+=Edge_Node[x].result[1]
-        #    Edge_AVG_Gather_Time+=Edge_Node[x].result[2]
-        #    Edge_AVG_Command_Time+=Edge_Node[x].result[3]
-        #tot+=Edge_Command_Count
-        #Edge_AVG_Time=Edge_AVG_Time/len(Edge_Node)
-        #Edge_AVG_Gather_Time=Edge_AVG_Gather_Time/len(Edge_Node)
-        #Edge_AVG_Command_Time=Edge_AVG_Command_Time/len(Edge_Node)
-        #Edge_AVG_Commands_Per_Sec=Edge_Command_Count/Edge_AVG_Command_Time
-        #pbar.update()
+        pbar.set_description("configuring edge leafs")
+        if len(nr.inventory.children_of_group("edge")) > 0:
+            Edge_Nodes = nr.filter(F(groups__contains="edge")) #this is the nornir object with only the edge nodes
+            Edge_Node = Edge_Nodes.run(task=ConfigEdgeLeaf)
+            for x in Edge_Node:
+                Edge_Command_Count+=Edge_Node[x].result[0]
+                Edge_AVG_Time+=Edge_Node[x].result[1]
+                Edge_AVG_Gather_Time+=Edge_Node[x].result[2]
+                Edge_AVG_Command_Time+=Edge_Node[x].result[3]
+            tot+=Edge_Command_Count
+            Edge_AVG_Time=Edge_AVG_Time/len(Edge_Node)
+            Edge_AVG_Gather_Time=Edge_AVG_Gather_Time/len(Edge_Node)
+            Edge_AVG_Command_Time=Edge_AVG_Command_Time/len(Edge_Node)
+            Edge_AVG_Commands_Per_Sec=Edge_Command_Count/Edge_AVG_Command_Time
+        else:
+            pbar.set_description("no edge leafs")
+            time.sleep(1)
+        pbar.update()
 
 
         pbar.set_description("configuring DHCP Servers")
@@ -281,6 +284,7 @@ def main():
     #print("rebooting")
     #nr.run(task=netmiko_send_command, command_string="reload", enable=True, use_timing=True)
     #nr.run(task=netmiko_send_command, command_string="y", enable=True, use_timing=True, ignore_errors=True)
+    
     try:
         print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {Ping_Avg_Time}")
         print(f"time spent configuring host information: {Host_Conf_Avg_Time}, sending a total command count of {Host_Config_command_count}, command PS count {Host_Commands_per_sec}")
@@ -288,11 +292,17 @@ def main():
         print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
         print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
         print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
-        #print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
+        try:
+            print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
+        except:
+            print("no edge leafs")
         print(f"time spent configuring DHCP: {DHCP_AVG_Time}, sending a total command count of {DHCP_Command_Count}, command PS count {DHCP_AVG_Commands_Per_Sec}")
         print(f"time spent turning off cdp: {ofCdp_AvgTime}")
-        totAVGComPS = (Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec)/6
-        print(f"total command PS: {totAVGComPS} PER THREAD/NODE wich is a total of{totAVGComPS*len(nr.inventory.hosts)}") #!add Edge_AVG_Commands_Per_Sec
+        try:
+            totAVGComPS = (Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6
+        except:
+            totAVGComPS = (Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec)/5
+        print(f"total command PS: {totAVGComPS} PER THREAD/NODE wich is a total of {totAVGComPS*len(nr.inventory.hosts)}") #!add 
         print(f"total commands sent: {tot}")
     except:
         print("error")
