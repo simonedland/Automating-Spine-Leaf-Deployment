@@ -16,6 +16,7 @@ from nornir_utils.plugins.functions import print_result
 from nornir.core.filter import F
 from tqdm import tqdm
 import time
+from decimal import Decimal
 
 #todo:
 #progressbar for DHCP
@@ -49,7 +50,7 @@ startTime=time.time() #this is the start time of the program
 def main():
 
     bringDown=False #this is the option to bring down the network
-    testNew=True #if you want to test the new code, set this to true
+    testNew=False #if you want to test the new code, set this to true
 
 
     tot=0
@@ -285,23 +286,23 @@ def main():
     #nr.run(task=netmiko_send_command, command_string="y", enable=True, use_timing=True, ignore_errors=True)
     
     try:
-        print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {Ping_Avg_Time}")
-        print(f"time spent configuring host information: {Host_Conf_Avg_Time}, sending a total command count of {Host_Config_command_count}, command PS count {Host_Commands_per_sec}")
-        print(f"time spent configuring EIGRP: {EIGRP_Avg_Time}, sending a total command count of {EIGRP_Command_Count}, command PS count {EIGRP_AVG_Commands_Per_Sec} using a average of {EIGRP_AVG_Gather_Time} on gathering information")
-        print(f"time spent configuring CDP: {CDP_AvgTime}, sending a total command count of {CDP_Command_Count}, command PS count {CDP_Commands_Per_Sec}")
-        print(f"time spent configuring HSRP: {HSRP_AVG_Time}, sending a total command count of {HSRP_Command_Count}, command PS count {HSRPPScommands}")
-        print(f"time spent configuring VPN Mesh: {VPN_Avg_Time}, sending a total command count of {VPN_Command_Count}, command PS count {VPN_AVG_Commands_Per_Sec}")
+        print(f"\n\n\n\n\n\n\n\n\n\ntime spent on average pinging: {round(Ping_Avg_Time, 2)}")
+        print(f"time spent configuring host information: {round(Host_Conf_Avg_Time, 2)}, sending a total command count of {round(Host_Config_command_count, 2)}, command PS count {round(Host_Commands_per_sec, 2)}")
+        print(f"time spent configuring EIGRP: {round(EIGRP_Avg_Time, 2)}, sending a total command count of {round(EIGRP_Command_Count, 2)}, command PS count {round(EIGRP_AVG_Commands_Per_Sec, 2)} using a average of {round(EIGRP_AVG_Gather_Time, 2)} on gathering information")
+        print(f"time spent configuring CDP: {round(CDP_AvgTime, 2)}, sending a total command count of {round(CDP_Command_Count, 2)}, command PS count {round(CDP_Commands_Per_Sec, 2)}")
+        print(f"time spent configuring HSRP: {round(HSRP_AVG_Time, 2)}, sending a total command count of {round(HSRP_Command_Count, 2)}, command PS count {round(HSRPPScommands, 2)}")
+        print(f"time spent configuring VPN Mesh: {round(VPN_Avg_Time, 2)}, sending a total command count of {round(VPN_Command_Count, 2)}, command PS count {round(VPN_AVG_Commands_Per_Sec, 2)}")
         try:
-            print(f"time spent configuring edge leafs: {Edge_AVG_Time}, sending a total command count of {Edge_Command_Count}, command PS count {Edge_AVG_Commands_Per_Sec}")
+            print(f"time spent configuring edge leafs: {round(Edge_AVG_Time, 2)}, sending a total command count of {round(Edge_Command_Count, 2)}, command PS count {round(Edge_AVG_Commands_Per_Sec, 2)}")
         except:
             print("no edge leafs")
-        print(f"time spent configuring DHCP: {DHCP_AVG_Time}, sending a total command count of {DHCP_Command_Count}, command PS count {DHCP_AVG_Commands_Per_Sec}")
-        print(f"time spent turning off cdp: {ofCdp_AvgTime}")
+        print(f"time spent configuring DHCP: {round(DHCP_AVG_Time, 2)}, sending a total command count of {round(DHCP_Command_Count, 2)}, command PS count {round(DHCP_AVG_Commands_Per_Sec, 2)}")
+        print(f"time spent turning off cdp: {round(ofCdp_AvgTime, 2)}")
         try:
-            totAVGComPS = (Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6
+            totAVGComPS = round((Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec+Edge_AVG_Commands_Per_Sec)/6, 2)
         except:
-            totAVGComPS = (Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec)/5
-        print(f"total command PS: {totAVGComPS} PER THREAD/NODE wich is a total of {totAVGComPS*len(nr.inventory.hosts)}") #!add 
+            totAVGComPS = round((Host_Commands_per_sec+EIGRP_AVG_Commands_Per_Sec+CDP_Commands_Per_Sec+HSRPPScommands+VPN_AVG_Commands_Per_Sec)/5, 2)
+        print(f"total command PS: {round(totAVGComPS, 2)} PER THREAD/NODE wich is a total of {round(totAVGComPS*len(nr.inventory.hosts), 2)}")
         print(f"total commands sent: {tot}")
     except:
         print("error")
@@ -311,4 +312,4 @@ def main():
 main() #run the main function
 
 
-print(f"the script took {time.time()-startTime} seconds") #prints how long the script took to run
+print(f"the script took {round(time.time()-startTime, 2)} seconds") #prints how long the script took to run
