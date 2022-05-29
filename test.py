@@ -48,8 +48,8 @@ startTime=time.time() #this is the start time of the program
 
 def main():
 
-    bringDown=True #this is the option to bring down the network
-    testNew=False #if you want to test the new code, set this to true
+    bringDown=False #this is the option to bring down the network
+    testNew=True #if you want to test the new code, set this to true
 
 
     tot=0
@@ -118,7 +118,6 @@ def main():
 
     elif testNew: #if you want to test the new code, set this to true
         pbar = tqdm(total=7)
-        print(len(nr.inventory.children_of_group("edge")))
 
     else: #runns the settup
         pbar = tqdm(total=10)
