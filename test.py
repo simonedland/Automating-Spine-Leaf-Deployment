@@ -307,11 +307,25 @@ def main(bringDown=False):
     except:
         print("error")
 
+    try:
+        totAVGComPS
+    except:
+        totAVGComPS = 0
 
     print(f"the script took {round(time.time()-startTime, 2)} seconds") #prints how long the script took to run
+    return round(time.time()-startTime, 2), tot, round(totAVGComPS, 2)
 
-main(True)
-main() #run the main function
 
+Timelist, Commandlist, CPSlist = [], [], []
+for x in range(5):
+    main(True)
+    tottime, commands, CPS = main() #run the main function
+    Timelist.append(tottime)
+    Commandlist.append(commands)
+    CPSlist.append(CPS)
+
+print(Timelist)
+print(Commandlist)
+print(CPSlist)
 
 
