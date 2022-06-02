@@ -113,7 +113,7 @@ def hsrpPair(node): #main function of this script
         pbar.set_description(f"{node.host}: done") #writes to the progress bar
         pbar.update() #updates the progress bar
 
-    else: #if the node is a leaf
+    else: #if the node is not a leaf
         commandList=[]
         GatherEndTime = 0
         GatherStartTime = 0

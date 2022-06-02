@@ -319,6 +319,12 @@ def main(bringDown=False):
 Timelist, Commandlist, CPSlist = [], [], []
 for x in range(5):
     main(True)
+
+    Wait = tqdm(total=30)
+    for x in range(30):
+        Wait.update()
+        time.sleep(1)
+
     tottime, commands, CPS = main() #run the main function
     Timelist.append(tottime)
     Commandlist.append(commands)

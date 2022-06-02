@@ -20,7 +20,7 @@ def subbnetMicroSegmentListMaker(SegmentationIps):
     for x in range(0,9): #makes 10 subbnets
         subbnetList.append(subbnetter(nettwork=f"{SegmentationIps}.{x}.0",
             nettworkReq=[
-            {"numberOfSubbnets":64, "requiredHosts":2},
+            {"numberOfSubbnets":64, "requiredHosts":2}
             ])) #makes 64 subbnets with 2 hosts each
 
     return subbnetList #returns the list
@@ -58,7 +58,6 @@ def MicroSegmenter(node, SegmentationIps="10.1", SpineHostName="spine", LeafHost
         longestname = len(SpineHostName) #sets the longest name to the spine hostname
     else:
         longestname = len(LeafHostname)
-    
 
     cdpNeigbourDirections=[]
     domNameLen=len(IpDomainName)

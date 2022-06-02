@@ -1,4 +1,4 @@
-from nornir_netmiko.tasks import netmiko_send_command, netmiko_send_config
+from nornir_netmiko.tasks import netmiko_send_config
 import time
 from tqdm import tqdm
 import random
@@ -19,8 +19,6 @@ def TurnOnCDP(node): # add a bit of randomness to the speed
     endTimecommands=time.time()
     Pbar.colour="magenta"
 
-
-    
     for x in range(0, 100):
         Pbar.update()
         time.sleep(random.uniform(0.1, 0.3)) #the randomness here is just to make it look like the script is doing something. it is to destract the user
