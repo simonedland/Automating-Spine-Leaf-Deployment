@@ -39,7 +39,6 @@ def AddDHCPPools(node, ipconfigs, gateway="first"):
     else: #if the connected leaf is less than the current leaf
         TakeUpperIpRange=False
 
-    counter=0
     commandlist=[]
     
     gateway=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.{int(str(ipconfigs[switchpair]['subbnetID']).split('.')[3])+1}"

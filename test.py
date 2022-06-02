@@ -13,6 +13,7 @@ from DHCPControll import AddDHCPPools
 #import other functions
 from nornir import InitNornir
 from nornir_utils.plugins.functions import print_result
+from nornir_utils.plugins.functions import netmiko_send_command
 from nornir.core.filter import F
 from tqdm import tqdm
 import time
@@ -260,7 +261,7 @@ def main(bringDown=False):
         DHCP_AVG_Command_Time=DHCP_AVG_Command_Time/len(DHCP_Node)
         DHCP_AVG_Commands_Per_Sec=DHCP_Command_Count/DHCP_AVG_Command_Time
         pbar.update()
-#
+        
         pbar.set_description("turning off cdp")
         nr.run(task=TurnOfCDP) #turn on CDP
         ofCdp_Node = nr.run(task=TurnOfCDP)
