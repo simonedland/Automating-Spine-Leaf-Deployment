@@ -6,12 +6,6 @@ from nornir_utils.plugins.functions import print_result
 def AddDHCPPools(node, ipconfigs, gateway="first"):
     StartTime=time.time()
 
-    """makes the command list of adding the dhcp pools with netmiko
-    normaly used with my subbnetter script
-    requires a list of dictionaries with the keys: subbnetID, broadcast and mask
-    this also points the dns to 8.8.8.8
-    the gateway is placed in the first avadable adress this can be spesified by setting the gateway="last" when caling
-    """
     
     #!CISCO does not support DHCP FAILOVER BUT WE CAN THEN JUST SPLITT THE DHCP POOLS INTO 2
     #!this should be done by excluding half of the subnets from the pool
@@ -48,13 +42,8 @@ def AddDHCPPools(node, ipconfigs, gateway="first"):
     counter=0
     commandlist=[]
     
-    if gateway =="first":
-        gateway=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.{int(str(ipconfigs[switchpair]['subbnetID']).split('.')[3])+1}"
-    elif gateway =="last":
-        gateway=f"{str(ipconfigs[switchpair]['broadcast']).split('.')[0]}.{str(ipconfigs[switchpair]['broadcast']).split('.')[1]}.{str(ipconfigs[switchpair]['broadcast']).split('.')[2]}.{int(str(ipconfigs[switchpair]['broadcast']).split('.')[3])-1}"
-    else:
-        gateway=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.{int(str(ipconfigs[switchpair]['subbnetID']).split('.')[3])+1}"
-
+    gateway=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.{int(str(ipconfigs[switchpair]['subbnetID']).split('.')[3])+1}"
+    
     if TakeUpperIpRange:
         excludLow=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.128"
         excludHigh=f"{str(ipconfigs[switchpair]['subbnetID']).split('.')[0]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[1]}.{str(ipconfigs[switchpair]['subbnetID']).split('.')[2]}.250"
