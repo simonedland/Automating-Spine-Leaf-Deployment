@@ -6,14 +6,14 @@ from resett import resetter, resettHostName
 from hsrpPair import hsrpPair
 from VPNMesh import vpnMaker
 from CDPControll import TurnOfCDP, TurnOnCDP
-from EdlgeLeafConfig import ConfigEdgeLeaf
+from EdgeLeafConfig import ConfigEdgeLeaf
 from Subbnetter import subbnetter
 from DHCPControll import AddDHCPPools
 
 #import other functions
 from nornir import InitNornir
 from nornir_utils.plugins.functions import print_result
-from nornir_utils.plugins.functions import netmiko_send_command
+#from nornir_utils.plugins.functions import netmiko_send_command
 from nornir.core.filter import F
 from tqdm import tqdm
 import time
@@ -318,7 +318,7 @@ def main(bringDown=False):
 
 
 Timelist, Commandlist, CPSlist = [], [], []
-for x in range(5):
+for x in range(1):
     main(True)
 
     Wait = tqdm(total=30)
