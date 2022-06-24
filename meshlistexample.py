@@ -1,11 +1,13 @@
-tunnelLan=[]
-NrOfSpines=2
-NrOfLeafs=3
+#tunnelLan=[]
+NrOfSpines=1
+NrOfLeafs=66
 scale=4
+Oct3Offset=0
 
 from Subbnetter import subbnetter
-for x in range(0,NrOfSpines): #not very modular and not very efficient in adition not very elegant either
-    tunnelLan.append(subbnetter(nettwork=f"10.3.{x*scale}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
+
+#for x in range(0,NrOfSpines): #not very modular and not very efficient in adition not very elegant either
+#    tunnelLan.append(subbnetter(nettwork=f"10.3.{x*scale}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
 
 #!WARNING THIS IS TRASH CODE BUT IT WORKS
 #!EXPLAIN HOW THE LISTS ARE CONNECTED IN THE PAPER
@@ -35,7 +37,7 @@ for Dim1 in range(0,NrOfLeafs): #this makes the ip list for the leafs
             else: #if the ip is not on the same row as the leaf meaning it is on a different tunnel (pointing to another leaf)
                 if Dim1 == 0: #if the ip is on the first row meaning it is on the first leaf
                     if NewIpList[Dim1][Dim2][-1]=="nan": #if the last ip is a nan meaning that it is the beginning of the list
-                        NewIpList[Dim1][Dim2].append(f"{Dim2*scale}.1") #adds the ip to the list
+                        NewIpList[Dim1][Dim2].append(f"{Dim2*scale+Oct3Offset}.1") #adds the ip to the list
 
                         iteration+=1
                         print(iteration)
@@ -45,7 +47,11 @@ for Dim1 in range(0,NrOfLeafs): #this makes the ip list for the leafs
 
                     else: #if the last ip is not a nan meaning that it is not the beginning of the list
                         prev = NewIpList[Dim1][Dim2][-1] #sets the prev variable to the last ip in the list
-                        NewIpList[Dim1][Dim2].append(f"{prev.split('.')[0]}.{int(prev.split('.')[1])+4}") #adds the ip to the list and adds 4 to the ip
+                        if int(prev.split('.')[1]) == 253: #if the last ip is the last ip in the list
+                            Oct3Offset+=1
+                            NewIpList[Dim1][Dim2].append(str(f"{int(prev.split('.')[0])+Oct3Offset}.1"))
+                        else:
+                            NewIpList[Dim1][Dim2].append(f"{prev.split('.')[0]}.{int(prev.split('.')[1])+4}") #adds the ip to the list and adds 4 to the ip
 
                         iteration+=1
                         print(iteration)
@@ -56,7 +62,12 @@ for Dim1 in range(0,NrOfLeafs): #this makes the ip list for the leafs
                 else: #if the ip is not on the first row meaning it is on a row that is not the first leaf
                     if Horisontal: #if it needs to create new ips bechause it passed itself
                         if NewIpList[Dim1][Dim2][-1]=="nan": #it it just passed
-                            NewIpList[Dim1][Dim2].append(f"{NewIpList[Dim1-1][Dim2][-1].split('.')[0]}.{int(NewIpList[Dim1-1][Dim2][-1].split('.')[1])+4}") #takes the last ip of the previous leaf and adds 4 to it
+                            if int(NewIpList[Dim1-1][Dim2][-1].split('.')[1]) == 253: #if the ip is the last ip in the row
+                                Oct3Offset+=1
+                                NewIpList[Dim1][Dim2].append(f"{int(NewIpList[0][0][1].split('.')[0])+Oct3Offset}.1")
+                            #print(NewIpList[Dim1-1][Dim2][-1].split('.')[1])
+                            else:
+                                NewIpList[Dim1][Dim2].append(f"{NewIpList[Dim1-1][Dim2][-1].split('.')[0]}.{int(NewIpList[Dim1-1][Dim2][-1].split('.')[1])+4}") #takes the last ip of the previous leaf and adds 4 to it
                             
                             iteration+=1
                             print(iteration)
@@ -65,7 +76,13 @@ for Dim1 in range(0,NrOfLeafs): #this makes the ip list for the leafs
                             print("\n")
 
                         else: #if it is not just passed
-                            NewIpList[Dim1][Dim2].append(NewIpList[Dim1][Dim2][-1].split('.')[0]+"."+str(int(NewIpList[Dim1][Dim2][-1].split('.')[1])+4)) #adds 4 to the last ip of the list
+                            print(int(NewIpList[Dim1][Dim2][-1].split('.')[1])+4)
+
+                            if int(NewIpList[Dim1][Dim2][-1].split('.')[1]) == 253:
+                                Oct3Offset+=1
+                                NewIpList[Dim1][Dim2].append(str(int(NewIpList[1][0][-1].split('.')[0])+Oct3Offset)+"."+str("1")) #adds 4 to the last ip of the list
+                            else:
+                                NewIpList[Dim1][Dim2].append(str(int(NewIpList[Dim1][Dim2][-1].split('.')[0]))+"."+str(int(NewIpList[Dim1][Dim2][-1].split('.')[1])+4)) #adds 4 to the last ip of the list
                             
                             iteration+=1
                             print(iteration)
@@ -82,7 +99,9 @@ for Dim1 in range(0,NrOfLeafs): #this makes the ip list for the leafs
                             print(x)
                         print("\n")
                         
-for x in tunnelLan:
-    print(x)
+#for x in tunnelLan:
+#    for y in x:
+#        print(y)
+
 for x in NewIpList:
     print(x)
