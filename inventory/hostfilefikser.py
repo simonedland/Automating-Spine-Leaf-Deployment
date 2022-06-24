@@ -56,6 +56,6 @@ for x in range(nr_of_leafs):
     y+=1
 
 print(mydict)
-with open('result.yml', 'w') as yaml_file:
+with open("inventory/result.yml", 'w') as yaml_file:
     yaml_file.write("---\n")
     yaml.dump(mydict, yaml_file, sort_keys=False)
