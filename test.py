@@ -128,8 +128,8 @@ def main(bringDown=False):
         pbar.set_description("pinging hosts")
         Ping_Node = nr.run(task=ping)
         for x in Ping_Node:
-            Ping_Avg_Time+=Ping_Node[x].result[1]
             tot+=Ping_Node[x].result[0]
+            Ping_Avg_Time+=Ping_Node[x].result[1]
         Ping_Avg_Time=Ping_Avg_Time/len(Ping_Node)
         pbar.update()
 
@@ -137,8 +137,8 @@ def main(bringDown=False):
         pbar.set_description("resetting host names")
         Host_Node = nr.run(task=resettHostName)
         for x in Host_Node:
-            Host_Conf_Avg_Time+=Host_Node[x].result[1]
             Host_Config_command_count+=Host_Node[x].result[0]
+            Host_Conf_Avg_Time+=Host_Node[x].result[1]
         tot+=Host_Config_command_count
         Host_Conf_Avg_Time=Host_Conf_Avg_Time/len(Host_Node)
         Host_Commands_per_sec=Host_Config_command_count/Host_Conf_Avg_Time
@@ -149,8 +149,8 @@ def main(bringDown=False):
         pbar.set_description("turning on cdp")
         CDP_Node = nr.run(task=TurnOnCDP)
         for x in CDP_Node:
-            CDP_AvgTime+=CDP_Node[x].result[1]
             CDP_Command_Count+=CDP_Node[x].result[0]
+            CDP_AvgTime+=CDP_Node[x].result[1]
             CDP_Average_Comand_Time+=CDP_Node[x].result[2]
         tot+=CDP_Command_Count
         CDP_AvgTime=CDP_AvgTime/len(CDP_Node)
@@ -165,8 +165,8 @@ def main(bringDown=False):
             LeafHostname="leaf", 
             IpDomainName="simon")
         for x in EIGRP_Node:
-            EIGRP_Avg_Time+=EIGRP_Node[x].result[1]
             EIGRP_Command_Count+=EIGRP_Node[x].result[0]
+            EIGRP_Avg_Time+=EIGRP_Node[x].result[1]
             EIGRP_Average_Gather_Time=EIGRP_Node[x].result[2]
             EIGRP_AVG_Command_Time+=EIGRP_Node[x].result[3]
         tot+=EIGRP_Command_Count
@@ -180,8 +180,8 @@ def main(bringDown=False):
         pbar.set_description("configging HSRP")
         HSRP_Node = nr.run(task=hsrpPair)
         for x in HSRP_Node:
-            HSRP_AVG_Time+=HSRP_Node[x].result[1]
             HSRP_Command_Count+=HSRP_Node[x].result[0]
+            HSRP_AVG_Time+=HSRP_Node[x].result[1]
             Node_HSRP_Gather_Time=HSRP_Node[x].result[2]
             if Node_HSRP_Gather_Time != 0:
                 HSRP_AVG_Gather_Time+=HSRP_Node[x].result[2]
@@ -314,6 +314,27 @@ def main(bringDown=False):
         totAVGComPS = 0
 
     print(f"the script took {round(time.time()-startTime, 2)} seconds") #prints how long the script took to run
+
+    try:
+        print(f" ping: time {Ping_Avg_Time}")
+        print(f" host config: time {Host_Conf_Avg_Time}, command count {Host_Config_command_count}, command PS {Host_Commands_per_sec}")
+        print(f"CDP: time {CDP_AvgTime}, command count {CDP_Command_Count}, command PS {CDP_Commands_Per_Sec}, gather time {CDP_Average_Comand_Time}")
+        print(f" EIGRP: time {EIGRP_Avg_Time}, command count {EIGRP_Command_Count}, command PS {EIGRP_AVG_Commands_Per_Sec}, gather time {EIGRP_AVG_Gather_Time}, command time {EIGRP_AVG_Command_Time}")
+        print(f" HSRP: time {HSRP_AVG_Time}, command count {HSRP_Command_Count}, command PS {HSRPPScommands}, gather time {HSRP_AVG_Gather_Time}, command time {HSRP_Average_Comand_Time}")
+        print(f" VPN: time {VPN_Avg_Time}, command count {VPN_Command_Count}, command PS {VPN_AVG_Commands_Per_Sec}, gather time {VPN_AVG_Gather_Time}, command time {VPN_AVG_Command_Time}")
+        print(f" Edge: time {Edge_AVG_Time}, command count {Edge_Command_Count}, command PS {Edge_AVG_Commands_Per_Sec}, gather time {Edge_AVG_Gather_Time}, command time {Edge_AVG_Command_Time}")
+        print(f" DHCP: time {DHCP_AVG_Time}, command count {DHCP_Command_Count}, command PS {DHCP_AVG_Commands_Per_Sec}, gather time {DHCP_AVG_Gather_Time}, command time {DHCP_AVG_Command_Time}")
+        print(f" turn off CDP: time {ofCdp_AvgTime}")
+    except:
+        print("LOLOLOL")
+
+
+
+
+
+
+
+
     return round(time.time()-startTime, 2), tot, round(totAVGComPS, 2)
 
 
