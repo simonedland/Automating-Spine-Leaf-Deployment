@@ -1,1 +1,37 @@
 ---
+spine1.cmh:
+  groups:
+  - spine
+  hostname: 1
+spine2.cmh:
+  groups:
+  - spine
+  hostname: 2
+spine3.cmh:
+  groups:
+  - spine
+  hostname: 3
+spine4.cmh:
+  groups:
+  - spine
+  hostname: 4
+spine5.cmh:
+  groups:
+  - spine
+  hostname: 5
+spine6.cmh:
+  groups:
+  - spine
+  hostname: 6
+spine7.cmh:
+  groups:
+  - spine
+  hostname: 7
+spine8.cmh:
+  groups:
+  - spine
+  hostname: 8
+spine9.cmh:
+  groups:
+  - spine
+  hostname: 9
