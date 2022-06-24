@@ -1,9 +1,11 @@
 tunnelLan=[]
 NrOfSpines=2
 NrOfLeafs=3
+scale=4
+
 from Subbnetter import subbnetter
 for x in range(0,NrOfSpines): #not very modular and not very efficient in adition not very elegant either
-    tunnelLan.append(subbnetter(nettwork=f"10.3.{x}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
+    tunnelLan.append(subbnetter(nettwork=f"10.3.{x*scale}.0",nettworkReq=[{"numberOfSubbnets":NrOfLeafs, "requiredHosts":2},]))
 
 #!WARNING THIS IS TRASH CODE BUT IT WORKS
 #!EXPLAIN HOW THE LISTS ARE CONNECTED IN THE PAPER
@@ -33,7 +35,7 @@ for Dim1 in range(0,NrOfLeafs): #this makes the ip list for the leafs
             else: #if the ip is not on the same row as the leaf meaning it is on a different tunnel (pointing to another leaf)
                 if Dim1 == 0: #if the ip is on the first row meaning it is on the first leaf
                     if NewIpList[Dim1][Dim2][-1]=="nan": #if the last ip is a nan meaning that it is the beginning of the list
-                        NewIpList[Dim1][Dim2].append(f"{Dim2}.1") #adds the ip to the list
+                        NewIpList[Dim1][Dim2].append(f"{Dim2*scale}.1") #adds the ip to the list
 
                         iteration+=1
                         print(iteration)
@@ -80,4 +82,7 @@ for Dim1 in range(0,NrOfLeafs): #this makes the ip list for the leafs
                             print(x)
                         print("\n")
                         
-
+for x in tunnelLan:
+    print(x)
+for x in NewIpList:
+    print(x)
