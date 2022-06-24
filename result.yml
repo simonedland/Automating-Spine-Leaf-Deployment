@@ -1,75 +1,75 @@
 ---
-leaf1.cmh:
-  data:
-    switchpair: 1
-  groups:
-  - leaf
-  hostname: 10.100.0.4
-leaf10.cmh:
-  data:
-    switchpair: 5
-  groups:
-  - leaf
-  - edge
-  hostname: 10.100.0.13
-leaf2.cmh:
-  data:
-    switchpair: 1
-  groups:
-  - leaf
-  hostname: 10.100.0.5
-leaf3.cmh:
-  data:
-    switchpair: 2
-  groups:
-  - leaf
-  hostname: 10.100.0.6
-leaf4.cmh:
-  data:
-    switchpair: 2
-  groups:
-  - leaf
-  hostname: 10.100.0.7
-leaf5.cmh:
-  data:
-    switchpair: 3
-  groups:
-  - leaf
-  hostname: 10.100.0.8
-leaf6.cmh:
-  data:
-    switchpair: 3
-  groups:
-  - leaf
-  hostname: 10.100.0.9
-leaf7.cmh:
-  data:
-    switchpair: 4
-  groups:
-  - leaf
-  hostname: 10.100.0.10
-leaf8.cmh:
-  data:
-    switchpair: 4
-  groups:
-  - leaf
-  hostname: 10.100.0.11
-leaf9.cmh:
-  data:
-    switchpair: 5
-  groups:
-  - leaf
-  - edge
-  hostname: 10.100.0.12
 spine1.cmh:
-  groups:
-  - spine
   hostname: 10.100.0.1
+  groups:
+  - spine
 spine2.cmh:
-  groups:
-  - spine
   hostname: 10.100.0.2
-spine3.cmh:
   groups:
   - spine
+spine3.cmh:
   hostname: 10.100.0.3
+  groups:
+  - spine
+leaf1.cmh:
+  hostname: 10.100.0.4
+  groups:
+  - leaf
+  data:
+    switchpair: 1
+leaf2.cmh:
+  hostname: 10.100.0.5
+  groups:
+  - leaf
+  data:
+    switchpair: 1
+leaf3.cmh:
+  hostname: 10.100.0.6
+  groups:
+  - leaf
+  data:
+    switchpair: 2
+leaf4.cmh:
+  hostname: 10.100.0.7
+  groups:
+  - leaf
+  data:
+    switchpair: 2
+leaf5.cmh:
+  hostname: 10.100.0.8
+  groups:
+  - leaf
+  data:
+    switchpair: 3
+leaf6.cmh:
+  hostname: 10.100.0.9
+  groups:
+  - leaf
+  data:
+    switchpair: 3
+leaf7.cmh:
+  hostname: 10.100.0.10
+  groups:
+  - leaf
+  data:
+    switchpair: 4
+leaf8.cmh:
+  hostname: 10.100.0.11
+  groups:
+  - leaf
+  data:
+    switchpair: 4
+leaf9.cmh:
+  hostname: 10.100.0.12
+  groups:
+  - leaf
+  - edge
+  data:
+    switchpair: 5
+leaf10.cmh:
+  hostname: 10.100.0.13
+  groups:
+  - leaf
+  - edge
+  data:
+    switchpair: 5
