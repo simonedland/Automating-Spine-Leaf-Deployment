@@ -48,8 +48,24 @@ def subbnetter(nettwork, nettworkReq):
 
 
             elif host_bit_length>8 and host_bit_length<=16:
-                print("more than 8")
-                print(nettwork.split(".")[2])
+                print(nettwork)
+                octet_bits=bin(int(nettwork.split(".")[2]))[2:]
+                new_octet_bits=octet_bits[:-host_bit_length+9]+"0"*(host_bit_length-9) #cleans the bits up for the subbnet by replacing anny 1 where there should be 0
+                new_octet_int=int(f"{new_octet_bits}",2)
+                host_bit_value=int(host_bit_value/256)
+                print(new_octet_bits, octet_bits, host_bit_length, host_bit_length, nettwork.split(".")[2])
+
+                if host_bit_value+new_octet_int==256:
+                    if int(nettwork.split('.')[1])+1==256:
+                        next_nettwork=f"{nettwork.split('.')[0]}.{int(nettwork.split('.')[1])+1}.0.0"
+                    else:
+                        next_nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{int(nettwork.split('.')[2])+1}.0"
+                    new_octet_int=0
+                else:
+                    print("test")
+                    next_nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{new_octet_int+host_bit_value}.0"
+                nettwork=next_nettwork
+                print(nettwork)
 
             elif host_bit_length>16 and host_bit_length<=24:
                 print("more than 16")

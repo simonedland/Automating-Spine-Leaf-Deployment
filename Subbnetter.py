@@ -50,7 +50,6 @@ def subbnetter(nettwork, nettworkReq):
                             networkOctetList[3]+=octetValueList[counter] #adds the value to the octet
                             broadcast=f"{networkOctetList[0]}.{networkOctetList[1]}.{networkOctetList[2]}.{networkOctetList[3]-1}" #sets the broadcast
 
-
                     # octet 3 handler
                     elif counter <= 16 and counter > 8:
                         if octetValueList[counter-8] + networkOctetList[2] == 256:
@@ -60,7 +59,6 @@ def subbnetter(nettwork, nettworkReq):
                         elif octetValueList[counter-8] + networkOctetList[2] < 256:
                             networkOctetList[2]+=octetValueList[counter-8]
                             broadcast=f"{networkOctetList[0]}.{networkOctetList[1]}.{networkOctetList[2]-1}.255"
-
 
                     # octet 2 handler
                     elif counter <= 24 and counter > 16:
