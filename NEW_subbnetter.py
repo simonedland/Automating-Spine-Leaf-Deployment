@@ -83,6 +83,11 @@ def subbnetter(nettwork, nettworkReq):
                     new_octet_int=int(f"{octet_bits}",2)
                 new_nettwork=f"{new_octet_int+(int(host_bit_value/(256*256*256)))}.0.0.0"
 
+
+
+
+
+
             nettwork=new_nettwork
 
             print(new_nettwork, host_bit_value)
