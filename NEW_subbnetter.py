@@ -15,6 +15,8 @@ def subbnetter(nettwork, nettworkReq):
     subbnets=[]
     for x in nettworkReq:
         for y in range(x["numberOfSubbnets"]):
+            
+            print(nettwork)
 
             #finds the minimum host ips to use per subnet
             host_bit_value=0
@@ -28,82 +30,62 @@ def subbnetter(nettwork, nettworkReq):
             host_bit_length=len(bin(host_bit_value)[2:])
 
             if host_bit_length<=8:
-                print(nettwork)
-                print(host_bit_length, host_bit_value)
                 octet_bits=bin(int(nettwork.split(".")[3]))[2:]
-                print(octet_bits)
                 new_octet_bits=octet_bits[:-host_bit_length+1]+"0"*(host_bit_length-1)
-                print(new_octet_bits)
                 new_octet_int=int(f"{new_octet_bits}",2)
-                print(new_octet_int)
-                nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{nettwork.split('.')[2]}.{new_octet_int+host_bit_value}"
-                
-
-
-
-
-                '''
-                octet_bits=bin(int(nettwork.split(".")[3]))[2:]
-                new_octet_bits=octet_bits[:-host_bit_length+1]+"0"*(host_bit_length-1) #cleans the bits up for the subbnet by replacing anny 1 where there should be 0
-                new_octet_int=int(f"{new_octet_bits}",2)
-                if host_bit_value+new_octet_int==256:
-                    if int(nettwork.split('.')[2])+1==256:
-                        if int(nettwork.split('.')[1])+1==256:
-                            next_nettwork=f"{int(nettwork.split('.')[0])+1}.0.0.0"
+                if new_octet_int+host_bit_value>=256: #if octet four overflows
+                    if int(nettwork.split(".")[2])+1>=256:
+                        if int(nettwork.split(".")[1])+1>=256:
+                            new_nettwork=f"{int(nettwork.split('.')[0])+1}.0.0.0"
                         else:
-                            next_nettwork=f"{nettwork.split('.')[0]}.{int(nettwork.split('.')[1])+1}.0.0"
+                            new_nettwork=f"{nettwork.split('.')[0]}.{int(nettwork.split('.')[1])+1}.0.0"
                     else:
-                        next_nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{int(nettwork.split('.')[2])+1}.0"
-                    new_octet_int=0
+                        new_nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{int(nettwork.split('.')[2])+1}.0"
                 else:
-                    next_nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{nettwork.split('.')[2]}.{new_octet_int+host_bit_value}"
-                nettwork=next_nettwork
-                '''
-                
-
-                
-                print(nettwork)
+                    new_nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{nettwork.split('.')[2]}.{new_octet_int+host_bit_value}"
 
 
             elif host_bit_length>8 and host_bit_length<=16:
-                print("more than 8")
-                print(nettwork)
                 octet_bits=bin(int(nettwork.split(".")[2]))[2:]
-                print(octet_bits, host_bit_length, host_bit_value)
                 new_octet_bits=octet_bits[:(9-host_bit_length)]+"0"*(host_bit_length-9)
-                print(new_octet_bits)
-
                 if new_octet_bits: #prevents there from beeing an error if you only add one to the octet
                     new_octet_int=int(f"{new_octet_bits}",2)
                 else:
                     new_octet_int=int(f"{octet_bits}",2)
+                if (host_bit_value/256)+new_octet_int==256: #if octet three overflows
+                    if int(nettwork.split('.')[1])+1==256:
+                        new_nettwork=f"{int(nettwork.split('.')[0])+1}.0.0.0"
+                    else:
+                        new_nettwork=f"{nettwork.split('.')[0]}.{int(nettwork.split('.')[1])+1}.0.0"
+                else:
+                    new_nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{new_octet_int+(int(host_bit_value/256))}.0"
 
-                nettwork=f"{nettwork.split('.')[0]}.{nettwork.split('.')[1]}.{new_octet_int+(int(host_bit_value/256))}.0"
-
-                print(nettwork)
 
             elif host_bit_length>16 and host_bit_length<=24:
-                print("more than 16")
-                print(nettwork)
                 octet_bits=bin(int(nettwork.split(".")[1]))[2:]
-                print(octet_bits, host_bit_length, host_bit_value)
                 new_octet_bits=octet_bits[:(17-host_bit_length)]+"0"*(host_bit_length-17)
-                print(new_octet_bits)
-
                 if new_octet_bits: #prevents there from beeing an error if you only add one to the octet
                     new_octet_int=int(f"{new_octet_bits}",2)
                 else:
                     new_octet_int=int(f"{octet_bits}",2)
+                if (host_bit_value/256/256)+new_octet_int==256: #if octet two overflows
+                    new_nettwork=f"{int(nettwork.split('.')[0])+1}.0.0.0"
+                else:
+                    new_nettwork=f"{nettwork.split('.')[0]}.{new_octet_int+(int(host_bit_value/(256*256)))}.0.0"
 
-                nettwork=f"{nettwork.split('.')[0]}.{new_octet_int+(int(host_bit_value/(256*256)))}.0.0"
-
-                print(nettwork)
 
             elif host_bit_length>24 and host_bit_length<=32:
-                print("more than 24")
-                print(nettwork.split(".")[0])
-            
+                octet_bits=bin(int(nettwork.split(".")[0]))[2:]
+                new_octet_bits=octet_bits[:(25-host_bit_length)]+"0"*(host_bit_length-25)
+                if new_octet_bits: #prevents there from beeing an error if you only add one to the octet
+                    new_octet_int=int(f"{new_octet_bits}",2)
+                else:
+                    new_octet_int=int(f"{octet_bits}",2)
+                new_nettwork=f"{new_octet_int+(int(host_bit_value/(256*256*256)))}.0.0.0"
 
+            nettwork=new_nettwork
+
+            print(new_nettwork, host_bit_value)
             print("\n")
             #do the subbnetting
 
